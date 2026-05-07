@@ -1,0 +1,178 @@
+@use '../styles/variables' as *;
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+
+  .product-card {
+    background: white;
+    border: 1px solid $border;
+    border-radius: $radius;
+    overflow: hidden;
+    transition: box-shadow $transition-medium, transform $transition-medium;
+    position: relative;
+
+    &:hover {
+      box-shadow: 0 12px 40px rgba($dark, 0.1);
+      transform: translateY(-3px);
+      .product-image img {
+        transform: scale(1.05);
+      }
+    }
+
+    .product-image {
+      aspect-ratio: 1;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s;
+        opacity: 0.7;
+      }
+
+      .product-icon-overlay {
+        position: absolute;
+        font-size: 4rem;
+        z-index: 1;
+      }
+    }
+
+    .product-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: $rose;
+      color: white;
+      font-size: 0.62rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 1px;
+      z-index: 2;
+
+      &.new {
+        background: $sage;
+      }
+    }
+
+    .product-wishlist {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: white;
+      border: 1px solid $border;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 2;
+      transition: all 0.2s;
+
+      &.active {
+        background: $rose;
+        color: white;
+        border-color: $rose;
+      }
+
+      &:hover:not(.active) {
+        background: $rose-light;
+        color: $rose;
+      }
+    }
+
+    .product-body {
+      padding: 1rem 1.25rem 1.25rem;
+    }
+
+    .product-category {
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: $rose;
+      margin-bottom: 4px;
+    }
+
+    .product-stars {
+      font-size: 0.65rem;
+      color: #d4a853;
+      margin-bottom: 8px;
+      span {
+        color: $muted;
+        margin-left: 4px;
+      }
+    }
+
+    .product-name {
+      font-family: $serif;
+      font-size: 1.2rem;
+      font-weight: 400;
+      color: $dark;
+      margin-bottom: 6px;
+    }
+
+    .product-desc {
+      font-size: 0.8rem;
+      color: $muted;
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    .product-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .product-price {
+      font-weight: 500;
+      font-size: 1rem;
+      color: $dark;
+      s {
+        font-weight: 300;
+        color: $muted;
+        font-size: 0.85rem;
+        margin-right: 6px;
+      }
+    }
+
+    .add-to-cart {
+      background: $dark;
+      color: white;
+      padding: 8px 16px;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 1px;
+
+      &.added {
+        background: $sage;
+      }
+
+      &:hover:not(.added) {
+        background: $rose;
+      }
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,110 @@
+@use 'variables' as *;
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: $sans;
+  background: $cream;
+  color: $dark;
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $serif;
+  font-weight: 300;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: $transition-fast;
+}
+
+ul {
+  list-style: none;
+}
+
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: $sans;
+  transition: $transition-fast;
+}
+
+.btn-primary {
+  background: $dark;
+  color: $cream;
+  padding: 14px 32px;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  &:hover {
+    background: $rose;
+  }
+}
+
+.btn-outline {
+  background: none;
+  color: $dark;
+  border: 1px solid $border;
+  padding: 14px 32px;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  &:hover {
+    border-color: $rose;
+    color: $rose;
+  }
+}
+
+.section {
+  padding: $section-padding;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.section-eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: $rose;
+  margin-bottom: 0.8rem;
+}
+
+.section-title {
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  em {
+    font-style: italic;
+    color: $rose;
+  }
+}
+
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity $transition-slow, transform $transition-slow;
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 900px) {
+  .section {
+    padding: 3rem 5vw;
+  }
+}
