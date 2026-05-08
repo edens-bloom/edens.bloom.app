@@ -91,6 +91,41 @@
         white-space: nowrap;
       }
     }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.8rem;
+      color: $muted;
+
+      .username {
+        font-weight: 500;
+        text-transform: capitalize;
+      }
+
+      .logout-btn {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: $rose;
+        cursor: pointer;
+        
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .login-btn {
+      color: $muted;
+      display: flex;
+      align-items: center;
+      
+      &:hover {
+        color: $rose;
+      }
+    }
   }
 }
 

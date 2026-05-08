@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../store/useStore';
-import { Search, Heart, ShoppingBag } from 'lucide-react';
+import { Search, Heart, ShoppingBag, User } from 'lucide-react';
 import './Navbar.scss';
 
 const Navbar: React.FC = () => {
-  const { getCartCount, wishlist } = useStore();
+  const { getCartCount, wishlist, user, logout } = useStore();
 
   return (
     <nav className="navbar">
@@ -15,7 +15,7 @@ const Navbar: React.FC = () => {
       <ul className="nav-links">
         <li><Link to="/">Shop</Link></li>
         <li><Link to="/">Occasions</Link></li>
-        <li><Link to="/">Décor</Link></li>
+        {user?.role === 'admin' && <li><Link to="/product" style={{ color: '#c53030', fontWeight: '600' }}>Manage</Link></li>}
         <li><Link to="/">About</Link></li>
       </ul>
       <div className="nav-icons">
@@ -30,6 +30,17 @@ const Navbar: React.FC = () => {
           <ShoppingBag size={18} />
           <span className="cart-text">Cart ({getCartCount()})</span>
         </Link>
+        
+        {user ? (
+          <div className="user-menu">
+            <span className="username">{user.username}</span>
+            <button onClick={logout} className="logout-btn">Logout</button>
+          </div>
+        ) : (
+          <Link to="/login" className="login-btn" title="Admin Login">
+            <User size={18} />
+          </Link>
+        )}
       </div>
     </nav>
   );

@@ -1,87 +1,41 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { useStore } from '../store/useStore';
-import { Heart } from 'lucide-react';
+import { Heart, Loader2 } from 'lucide-react';
 import heroImg from '../assets/images/hero.png';
 import './ProductGrid.scss';
 
-const products = [
-  {
-    id: 1,
-    name: 'Garden Rose Bliss',
-    price: 58,
-    oldPrice: 72,
-    category: 'Roses',
-    image: heroImg,
-    badge: 'Sale',
-    rating: 5,
-    reviews: 142,
-    description: '12 premium garden roses in blush & cream with eucalyptus sprigs.',
-    icon: '🌹'
-  },
-  {
-    id: 2,
-    name: 'Spring Meadow Mix',
-    price: 48,
-    category: 'Mixed',
-    image: heroImg,
-    badge: 'New',
-    rating: 5,
-    reviews: 89,
-    description: 'A joyful mix of tulips, ranunculus & wildflowers in pastel tones.',
-    icon: '💐'
-  },
-  {
-    id: 3,
-    name: 'Peony Paradise',
-    price: 76,
-    category: 'Seasonal',
-    image: heroImg,
-    badge: 'Popular',
-    rating: 4,
-    reviews: 67,
-    description: 'Lush pink peonies wrapped in soft kraft paper & satin ribbon.',
-    icon: '🌸'
-  },
-  {
-    id: 4,
-    name: 'Golden Hour',
-    price: 44,
-    category: 'Sunflowers',
-    image: heroImg,
-    rating: 5,
-    reviews: 203,
-    description: 'Bold sunflowers with lush greenery — sunshine for any room.',
-    icon: '🌻'
-  },
-  {
-    id: 5,
-    name: 'Dried Pampas Bundle',
-    price: 62,
-    category: 'Décor',
-    image: heroImg,
-    badge: 'New',
-    rating: 5,
-    reviews: 55,
-    description: 'Minimalist dried botanicals — forever beautiful, zero maintenance.',
-    icon: '💮'
-  },
-  {
-    id: 6,
-    name: 'Country Garden',
-    price: 38,
-    oldPrice: 52,
-    category: 'Wildflowers',
-    image: heroImg,
-    badge: 'Sale',
-    rating: 4,
-    reviews: 91,
-    description: 'Cheerful daisies, chamomile & lavender in a rustic wrap.',
-    icon: '🌼'
-  }
-];
-
 const ProductGrid: React.FC = () => {
-  const { addToCart, toggleWishlist, wishlist } = useStore();
+  const { 
+    products, 
+    fetchProducts, 
+    isLoading, 
+    error, 
+    addToCart, 
+    toggleWishlist, 
+    wishlist 
+  } = useStore();
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  if (isLoading) {
+    return (
+      <div className="products-loading">
+        <Loader2 className="animate-spin" size={48} />
+        <p>Loading our beautiful collection...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="products-error">
+        <p>Oops! {error}</p>
+        <button onClick={() => fetchProducts()}>Try Again</button>
+      </div>
+    );
+  }
 
   return (
     <section className="section" id="occasions" style={{ background: 'white' }}>
@@ -114,7 +68,7 @@ const ProductGrid: React.FC = () => {
               <div className="product-desc">{product.description}</div>
               <div className="product-footer">
                 <div className="product-price">
-                  {product.oldPrice && <s>${product.oldPrice}</s>} ${product.price}
+                  {product.oldPrice && <s>${Number(product.oldPrice).toFixed(2)}</s>} ${Number(product.price).toFixed(2)}
                 </div>
                 <button 
                   className="add-to-cart" 

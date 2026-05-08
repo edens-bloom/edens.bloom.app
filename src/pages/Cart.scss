@@ -63,38 +63,48 @@
       transform: translateY(-2px);
     }
 
-    .item-image {
-      width: 120px;
-      height: 150px;
+    .item-image-carousel {
+      width: 140px;
+      height: 170px;
       flex-shrink: 0;
       background: $sage-light;
       border-radius: $radius;
       overflow: hidden;
+      position: relative;
 
-      img {
+      .carousel-image {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        
+        &.fade-in {
+          animation: fadeIn 0.4s ease-out;
+        }
       }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
     }
 
     .item-details {
       flex: 1;
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr auto;
+      grid-template-columns: 2.5fr 1fr 1fr auto;
       align-items: center;
-      gap: 1.5rem;
+      gap: 2rem;
 
-      @media (max-width: 640px) {
+      @media (max-width: 800px) {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        gap: 1.5rem;
       }
     }
 
     .item-info {
       h3 {
         font-family: $serif;
-        font-size: 1.25rem;
+        font-size: 1.3rem;
         margin-bottom: 0.25rem;
       }
 
@@ -103,6 +113,54 @@
         color: $muted;
         text-transform: uppercase;
         letter-spacing: 0.05em;
+        margin-bottom: 1.25rem;
+      }
+
+      .packaging-selector {
+        .selector-label {
+          font-size: 0.75rem;
+          text-transform: uppercase;
+          color: $muted;
+          margin-bottom: 0.75rem;
+          letter-spacing: 0.05em;
+        }
+
+        .radio-group {
+          display: flex;
+          gap: 0.5rem;
+          flex-wrap: wrap;
+
+          .radio-item {
+            cursor: pointer;
+            position: relative;
+            
+            input {
+              display: none;
+            }
+
+            span {
+              display: inline-block;
+              padding: 6px 12px;
+              border: 1px solid $border;
+              border-radius: 20px;
+              font-size: 0.75rem;
+              transition: all 0.2s ease;
+              color: $muted;
+            }
+
+            &:hover span {
+              border-color: $rose;
+              color: $rose;
+            }
+
+            &.active span {
+              background: $rose;
+              border-color: $rose;
+              color: white;
+              box-shadow: 0 4px 10px rgba($rose, 0.2);
+            }
+          }
+        }
       }
     }
 
@@ -138,9 +196,44 @@
     }
 
     .item-price {
-      font-weight: 600;
-      font-size: 1.1rem;
-      text-align: right;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      min-width: 220px;
+      padding-left: 1rem;
+      border-left: 1px solid $border;
+
+      @media (max-width: 800px) {
+        padding-left: 0;
+        border-left: none;
+        border-top: 1px solid $border;
+        padding-top: 1rem;
+      }
+
+      .price-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: $muted;
+
+        &.packaging-row {
+          color: $rose;
+        }
+
+        &.item-total-row {
+          margin-top: 0.5rem;
+          padding-top: 0.5rem;
+          border-top: 1px dashed $border;
+          color: $dark;
+          font-weight: 600;
+          font-size: 1rem;
+
+          .price-total-value {
+            color: $dark;
+            font-size: 1.1rem;
+          }
+        }
+      }
     }
 
     .remove-btn {
