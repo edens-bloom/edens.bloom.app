@@ -5,6 +5,9 @@ export interface Product {
   oldPrice?: number;
   category: string;
   image: string;
+  plasticBagImage?: string;
+  paperBagImage?: string;
+  noBagImage?: string;
   badge?: string;
   rating: number;
   reviews: number;
