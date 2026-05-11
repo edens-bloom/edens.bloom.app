@@ -1,19 +1,23 @@
-import { useEffect } from 'react';
-import { useStore } from '../store/useStore';
-import { Heart, Loader2 } from 'lucide-react';
-import heroImg from '../assets/images/hero.png';
-import './ProductGrid.scss';
+import React, { useEffect } from "react";
+import { useStore } from "../store/useStore";
+import { Loader2, ShoppingBag } from "lucide-react";
+import type { Product } from "../models/types";
+import { formatRs } from "../utils/formatRs";
+
+const getTierPrice = (product: Product, tier: "tier1" | "tier2" | "tier3") => {
+  const tierData = product.packages?.[tier];
+  const tierPrice = tierData?.[`${tier}Price`];
+  return Number(tierPrice ?? product.price);
+};
+
+const getTierImage = (product: Product, tier: "tier1" | "tier2" | "tier3") => {
+  const tierData = product.packages?.[tier];
+  const tierImage = tierData?.[`${tier}ImageUrl`];
+  return typeof tierImage === "string" ? tierImage : product.image;
+};
 
 const ProductGrid: React.FC = () => {
-  const { 
-    products, 
-    fetchProducts, 
-    isLoading, 
-    error, 
-    addToCart, 
-    toggleWishlist, 
-    wishlist 
-  } = useStore();
+  const { products, fetchProducts, isLoading, error, addToCart } = useStore();
 
   useEffect(() => {
     fetchProducts();
@@ -21,78 +25,88 @@ const ProductGrid: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="products-loading">
-        <Loader2 className="animate-spin" size={48} />
-        <p>Loading our beautiful collection...</p>
+      <div className="page-container product-grid__state product-grid__state--loading">
+        <Loader2 className="product-grid__spinner" size={48} />
+        <p className="type-label-md">Loading our beautiful collection...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="products-error">
-        <p>Oops! {error}</p>
-        <button onClick={() => fetchProducts()}>Try Again</button>
+      <div className="page-container product-grid__state product-grid__state--error">
+        <p className="type-label-md">Oops! {error}</p>
+        <button type="button" onClick={() => fetchProducts()} className="product-grid__retry">
+          Try Again
+        </button>
       </div>
     );
   }
 
   return (
-    <section className="section" id="occasions" style={{ background: 'white' }}>
-      <div className="section-header">
-        <div className="section-eyebrow">Bestsellers</div>
-        <h2 className="section-title">Most <em>loved</em> bouquets</h2>
+    <section className="product-grid" id="occasions">
+      <div className="product-grid__header">
+        <div className="product-grid__intro">
+          <span className="product-grid__eyebrow">Bestsellers</span>
+          <h2 className="product-grid__title">
+            Most <em className="product-grid__title-accent">loved</em> bouquets
+          </h2>
+        </div>
+        <a href="#occasions" className="product-grid__cta">
+          View All Products
+        </a>
       </div>
-      <div className="products-grid">
-        {products.map((product) => (
-          <div key={product.id} className="product-card fade-up visible">
-            <div className="product-image" style={{ background: '#f5f5f5' }}>
-              <img src={product.image} alt={product.name} />
-              <div className="product-icon-overlay">{product.icon}</div>
-              {product.badge && <div className={`product-badge ${product.badge.toLowerCase()}`}>{product.badge}</div>}
-              <button 
-                className={`product-wishlist ${wishlist.includes(product.id) ? 'active' : ''}`} 
-                onClick={() => toggleWishlist(product.id)}
-                title="Add to wishlist"
-              >
-                <Heart size={16} fill={wishlist.includes(product.id) ? 'white' : 'none'} />
-              </button>
-            </div>
-            <div className="product-body">
-              <div className="product-category">{product.category}</div>
-              <div className="product-stars">
-                {'★'.repeat(product.rating)}{'☆'.repeat(5 - product.rating)}
-                <span>({product.reviews})</span>
-              </div>
-              <div className="product-name">{product.name}</div>
-              <div className="product-desc">{product.description}</div>
-              <div className="product-footer">
-                <div className="product-price">
-                  {product.oldPrice && <s>${Number(product.oldPrice).toFixed(2)}</s>} ${Number(product.price).toFixed(2)}
+      <div className="product-grid__cards">
+        {products.map((product) => {
+          const tier1Price = getTierPrice(product, "tier1");
+          const tier1Image = getTierImage(product, "tier1");
+
+          return (
+            <div key={product.id} className="product-card fade-up visible">
+              <div className="product-card__media ambient-shadow felt-texture">
+                <img src={tier1Image} alt={product.name} />
+                {product.badge && <span className="product-card__badge">{product.badge}</span>}
+                <div className="product-card__overlay">
+                  <button
+                    type="button"
+                    className="product-card__add ambient-shadow press-effect"
+                    onClick={(e) => {
+                      const btn = e.currentTarget;
+                      const originalHTML = btn.innerHTML;
+                      btn.innerHTML = "<span>Added ✓</span>";
+                      btn.classList.add("product-card__add--accent");
+                      addToCart({
+                        ...product,
+                        price: tier1Price,
+                        image: tier1Image,
+                      });
+                      setTimeout(() => {
+                        btn.innerHTML = originalHTML;
+                        btn.classList.remove("product-card__add--accent");
+                      }, 1500);
+                    }}
+                  >
+                    <ShoppingBag size={18} /> Add to Cart
+                  </button>
                 </div>
-                <button 
-                  className="add-to-cart" 
-                  onClick={(e) => {
-                    const btn = e.currentTarget;
-                    const originalText = btn.textContent;
-                    btn.textContent = 'Added ✓';
-                    btn.classList.add('added');
-                    addToCart(product);
-                    setTimeout(() => {
-                      btn.textContent = originalText;
-                      btn.classList.remove('added');
-                    }, 1500);
-                  }}
-                >
-                  Add to Cart
-                </button>
+              </div>
+
+              <div>
+                <h4 className="product-card__title" title={product.name}>
+                  {product.name}
+                </h4>
+                <div className="product-card__price-row">
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <span className="product-card__price">{formatRs(tier1Price)}</span>
+                    {product.oldPrice && (
+                      <span className="product-card__old-price">{formatRs(Number(product.oldPrice))}</span>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-      <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-        <a href="#" className="btn-outline">View All Products</a>
+          );
+        })}
       </div>
     </section>
   );

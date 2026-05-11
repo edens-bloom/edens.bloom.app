@@ -1,58 +1,72 @@
-import React, { useState } from 'react';
-import { useStore } from '../store/useStore';
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
-import OrderConfirmation from '../components/OrderConfirmation';
-import './Cart.scss';
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { ShoppingBag, ArrowRight, Minus, Plus } from "lucide-react";
+import { useStore } from "../store/useStore";
+import OrderConfirmation from "../components/OrderConfirmation";
+import type { Product } from "../models/types";
+import { formatRs } from "../utils/formatRs";
+import "./Cart.scss";
+
+type TierKey = "tier1" | "tier2" | "tier3";
 
 const Cart: React.FC = () => {
-  const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart } = useStore();
+  const { cart, removeFromCart, updateQuantity, clearCart } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTierByItem, setSelectedTierByItem] = useState<Record<number, TierKey>>({});
 
-  const [packaging, setPackaging] = useState<Record<number, 'plastic' | 'paper' | 'none'>>({});
+  const getTierData = (item: Product, tier: TierKey) => {
+    const tierData = item.packages?.[tier];
+    const fallbackLabels: Record<TierKey, string> = {
+      tier1: "Basic",
+      tier2: "Standard",
+      tier3: "Premium",
+    };
 
-  const getPackagingPrice = (type: string) => {
-    switch (type) {
-      case 'plastic': return 1.50; // $1.50
-      case 'paper': return 0.75;   // $0.75
-      default: return 0;
-    }
+    const titleValue = tierData?.[`${tier}Title`];
+    const priceValue = tierData?.[`${tier}Price`];
+    const imageValue = tierData?.[`${tier}ImageUrl`];
+
+    return {
+      title:
+        typeof titleValue === "string" && titleValue.trim()
+          ? titleValue
+          : `${item.name} ${fallbackLabels[tier]}`,
+      label: fallbackLabels[tier],
+      price: Number(priceValue ?? item.price),
+      imageUrl: typeof imageValue === "string" ? imageValue : item.image,
+    };
   };
 
   const subtotal = cart.reduce((total, item) => {
-    const pkgPrice = getPackagingPrice(packaging[item.id] || 'none');
-    return total + (Number(item.price) * item.quantity) + pkgPrice;
+    const selectedTier = selectedTierByItem[item.id] || "tier1";
+    const selectedTierPrice = getTierData(item, selectedTier).price;
+    return total + selectedTierPrice * item.quantity;
   }, 0);
 
-  const shipping = subtotal > 150 ? 0 : 15;
+  const shipping = subtotal > 15000 ? 0 : 300;
   const total = subtotal + shipping;
 
-  const handleCheckout = () => {
-    setIsModalOpen(true);
-  };
+  const handleCheckout = () => setIsModalOpen(true);
 
   const handleConfirmOrder = () => {
     clearCart();
     setIsModalOpen(false);
   };
 
-  const getPackagingImage = (item: any, type: string) => {
-    switch (type) {
-      case 'plastic':
-        return 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&q=80&w=400';
-      case 'paper':
-        return 'https://images.unsplash.com/photo-1544816153-12ad58fd3f5a?auto=format&fit=crop&q=80&w=400';
-      default:
-        return item.image;
-    }
-  };
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    document.title = "Cart";
+  }, []);
 
   if (cart.length === 0) {
     return (
       <div className="cart-empty">
         <ShoppingBag size={64} />
         <h2>Your cart is empty</h2>
-        <p>Looks like you haven't added any bouquets yet.</p>
-        <Link to="/" className="btn-primary">Start Shopping</Link>
+        <p>Looks like you have not added any handcrafted blooms yet.</p>
+        <Link to="/" className="btn-primary">
+          Start Shopping
+        </Link>
       </div>
     );
   }
@@ -61,134 +75,176 @@ const Cart: React.FC = () => {
     <div className="cart-page">
       <div className="cart-container">
         <div className="cart-main">
-          <h1>Shopping Cart ({cart.length})</h1>
-          <div className="cart-items">
-            {cart.map((item) => {
-              const selectedType = packaging[item.id] || 'none';
-              return (
-                <div key={item.id} className="cart-item">
-                  <div className="item-image-carousel">
-                    <img 
-                      src={getPackagingImage(item, selectedType)} 
-                      alt={item.name} 
-                      className="carousel-image fade-in"
-                      key={`${item.id}-${selectedType}`}
-                    />
-                  </div>
-                  <div className="item-details">
-                    <div className="item-info">
-                      <h3>{item.name}</h3>
-                      <p className="item-category">{item.category}</p>
-                      
-                      <div className="packaging-selector">
-                        <p className="selector-label">Packaging Options:</p>
-                        <div className="radio-group">
-                          <label className={`radio-item ${selectedType === 'plastic' ? 'active' : ''}`}>
-                            <input 
-                              type="radio" 
-                              name={`packaging-${item.id}`} 
-                              value="plastic"
-                              checked={selectedType === 'plastic'}
-                              onChange={() => setPackaging(prev => ({ ...prev, [item.id]: 'plastic' }))}
-                            />
-                            <span>Plastic Bag (+$1.50)</span>
-                          </label>
-                          <label className={`radio-item ${selectedType === 'paper' ? 'active' : ''}`}>
-                            <input 
-                              type="radio" 
-                              name={`packaging-${item.id}`} 
-                              value="paper"
-                              checked={selectedType === 'paper'}
-                              onChange={() => setPackaging(prev => ({ ...prev, [item.id]: 'paper' }))}
-                            />
-                            <span>Paper Bag (+$0.75)</span>
-                          </label>
-                          <label className={`radio-item ${selectedType === 'none' ? 'active' : ''}`}>
-                            <input 
-                              type="radio" 
-                              name={`packaging-${item.id}`} 
-                              value="none"
-                              checked={selectedType === 'none'}
-                              onChange={() => setPackaging(prev => ({ ...prev, [item.id]: 'none' }))}
-                            />
-                            <span>No Bag</span>
-                          </label>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="item-quantity">
-                      <button onClick={() => updateQuantity(item.id, item.quantity - 1)}>
-                        <Minus size={16} />
-                      </button>
-                      <span>{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>
-                        <Plus size={16} />
-                      </button>
-                    </div>
-                    <div className="item-price">
-                      <div className="price-row">
-                        <span className="price-label">Product:</span>
-                        <span className="price-value">{item.quantity} × ${Number(item.price).toFixed(2)} = ${(Number(item.price) * item.quantity).toFixed(2)}</span>
-                      </div>
-                      {selectedType !== 'none' && (
-                        <div className="price-row packaging-row">
-                          <span className="price-label">Packaging Fee:</span>
-                          <span className="price-value">+${getPackagingPrice(selectedType).toFixed(2)}</span>
-                        </div>
-                      )}
-                      <div className="price-row item-total-row">
-                        <span className="price-label">Item Total:</span>
-                        <span className="price-total-value">${((Number(item.price) * item.quantity) + getPackagingPrice(selectedType)).toFixed(2)}</span>
-                      </div>
-                    </div>
-                    <button className="remove-btn" onClick={() => removeFromCart(item.id)}>
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="cart-heading">
+            <h1>
+              Shopping Cart{" "}
+              <span>
+                ({cart.length} {cart.length > 1 ? "items" : "item"})
+              </span>
+            </h1>
           </div>
 
-          <aside className="cart-summary">
-            <div className="summary-card">
-              <h2>Order Summary</h2>
-              <div className="summary-row">
-                <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
-              </div>
-              <div className="summary-row">
-                <span>Shipping</span>
-                <span>{shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}</span>
-              </div>
-              <div className="summary-row total">
-                <span>Total</span>
-                <span>${total.toFixed(2)}</span>
-              </div>
-              
-              <div className="shipping-notice">
-                {shipping === 0 ? (
-                  <p className="free-shipping">You've unlocked FREE shipping!</p>
-                ) : (
-                  <p>Add ${(150 - subtotal).toFixed(2)} more for FREE shipping.</p>
-                )}
-              </div>
+          <div className="cart-grid">
+            <section className="cart-items">
+              {cart.map((item) => {
+                const selectedTier = selectedTierByItem[item.id] || "tier1";
+                const selectedTierData = getTierData(item, selectedTier);
+                const tier1 = getTierData(item, "tier1");
+                const tier2 = getTierData(item, "tier2");
+                const tier3 = getTierData(item, "tier3");
+                const itemTotal = selectedTierData.price * item.quantity;
 
-              <button className="checkout-btn" onClick={handleCheckout}>
-                Proceed to Checkout <ArrowRight size={18} />
-              </button>
+                return (
+                  <article key={item.id} className="cart-item">
+                    <div className="item-image-carousel">
+                      <img
+                        src={selectedTierData.imageUrl}
+                        alt={item.name}
+                        className="carousel-image fade-in"
+                        key={`${item.id}-${selectedTier}`}
+                      />
+                    </div>
 
-              <div className="secure-checkout">
-                <p>Secure SSL Encrypted Checkout</p>
+                    <div className="item-content">
+                      <div className="item-top">
+                        <div>
+                          <h3>{item.name}</h3>
+                          <p className="item-category">{item.category}</p>
+                        </div>
+                        <button
+                          className="remove-btn"
+                          onClick={() => removeFromCart(item.id)}
+                          aria-label={`Remove ${item.name}`}
+                        >
+                          <span className="material-symbols-outlined">delete</span>
+                        </button>
+                      </div>
+
+                      <div className="packaging-selector">
+                        <p className="selector-label">Package Options</p>
+                        <div className="radio-group">
+                          <label
+                            className={`radio-item ${selectedTier === "tier1" ? "active" : ""}`}
+                          >
+                            <input
+                              type="radio"
+                              name={`tier-${item.id}`}
+                              value="tier1"
+                              checked={selectedTier === "tier1"}
+                              onChange={() =>
+                                setSelectedTierByItem((prev) => ({ ...prev, [item.id]: "tier1" }))
+                              }
+                            />
+                            <span>{tier1.label} ({formatRs(tier1.price)})</span>
+                          </label>
+
+                          <label
+                            className={`radio-item ${selectedTier === "tier2" ? "active" : ""}`}
+                          >
+                            <input
+                              type="radio"
+                              name={`tier-${item.id}`}
+                              value="tier2"
+                              checked={selectedTier === "tier2"}
+                              onChange={() =>
+                                setSelectedTierByItem((prev) => ({ ...prev, [item.id]: "tier2" }))
+                              }
+                            />
+                            <span>{tier2.label} ({formatRs(tier2.price)})</span>
+                          </label>
+
+                          <label
+                            className={`radio-item ${selectedTier === "tier3" ? "active" : ""}`}
+                          >
+                            <input
+                              type="radio"
+                              name={`tier-${item.id}`}
+                              value="tier3"
+                              checked={selectedTier === "tier3"}
+                              onChange={() =>
+                                setSelectedTierByItem((prev) => ({ ...prev, [item.id]: "tier3" }))
+                              }
+                            />
+                            <span>{tier3.label} ({formatRs(tier3.price)})</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div className="item-footer">
+                        <div className="item-quantity">
+                          <button
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            aria-label="Decrease quantity"
+                          >
+                            <Minus size={16} />
+                          </button>
+                          <span>{item.quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            aria-label="Increase quantity"
+                          >
+                            <Plus size={16} />
+                          </button>
+                        </div>
+
+                        <div className="item-price">
+                          <p>
+                            {selectedTierData.title}: {item.quantity} x{" "}
+                            {formatRs(selectedTierData.price)} = {formatRs(itemTotal)}
+                          </p>
+                          <p className="item-total-row">
+                            <span>Item Total:</span> <strong>{formatRs(itemTotal)}</strong>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </section>
+
+            <aside className="cart-summary">
+              <div className="summary-card">
+                <h2>Order Summary</h2>
+                <div className="summary-row">
+                  <span>Subtotal</span>
+                  <span>{formatRs(subtotal)}</span>
+                </div>
+                <div className="summary-row">
+                  <span>Shipping</span>
+                  <span>{shipping === 0 ? "FREE" : formatRs(shipping)}</span>
+                </div>
+                <div className="summary-row total">
+                  <span>Total</span>
+                  <span>{formatRs(total)}</span>
+                </div>
+
+                <button className="checkout-btn" onClick={handleCheckout}>
+                  Proceed to Checkout <ArrowRight size={18} />
+                </button>
+
+                <p className="shipping-note">
+                  {shipping === 0
+                    ? "Shipping will be calculated at checkout."
+                    : `Shipping calculated at checkout. Free shipping over ${formatRs(15000)}.`}
+                </p>
+
+                <div className="sustainability-note">
+                  <span className="material-symbols-outlined">eco</span>
+                  <p>
+                    Your handcrafted stems support sustainable artistry and reduction
+                    of floral waste.
+                  </p>
+                </div>
               </div>
-            </div>
-          </aside>
+            </aside>
+          </div>
         </div>
       </div>
 
       {isModalOpen && (
-        <OrderConfirmation 
-          onClose={() => setIsModalOpen(false)} 
+        <OrderConfirmation
+          onClose={() => setIsModalOpen(false)}
           onConfirm={handleConfirmOrder}
           total={total}
         />

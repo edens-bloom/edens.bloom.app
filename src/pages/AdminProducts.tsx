@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { Plus, Trash2, Package, DollarSign, Image as ImageIcon, Star, MessageSquare, Tag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { formatRs } from '../utils/formatRs';
 
 const AdminProducts: React.FC = () => {
   const { products, fetchProducts, addProduct, isLoading, error, user } = useStore();
@@ -23,7 +24,13 @@ const AdminProducts: React.FC = () => {
     rating: '5',
     reviews: '0',
     description: '',
-    icon: '🌹'
+    icon: '🌹',
+    plasticBagTitle: 'Plastic Bag',
+    plasticBagPrice: '1.50',
+    paperBagTitle: 'Paper Bag',
+    paperBagPrice: '0.75',
+    noBagTitle: 'No Bag',
+    noBagPrice: '0'
   });
 
   useEffect(() => {
@@ -91,7 +98,13 @@ const AdminProducts: React.FC = () => {
         rating: '5',
         reviews: '0',
         description: '',
-        icon: '🌹'
+        icon: '🌹',
+        plasticBagTitle: 'Plastic Bag',
+        plasticBagPrice: '1.50',
+        paperBagTitle: 'Paper Bag',
+        paperBagPrice: '0.75',
+        noBagTitle: 'No Bag',
+        noBagPrice: '0'
       });
     }
   };
@@ -140,11 +153,11 @@ const AdminProducts: React.FC = () => {
               </select>
             </div>
             <div className="form-group">
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Price ($)</label>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Price (Rs)</label>
               <input type="number" name="price" value={formData.price} onChange={handleChange} required style={{ width: '100%', padding: '0.6rem', borderRadius: '0.4rem', border: '1px solid #ddd' }} />
             </div>
             <div className="form-group">
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Old Price ($) - Optional</label>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Old Price (Rs) - Optional</label>
               <input type="number" name="oldPrice" value={formData.oldPrice} onChange={handleChange} style={{ width: '100%', padding: '0.6rem', borderRadius: '0.4rem', border: '1px solid #ddd' }} />
             </div>
             <div className="form-group" style={{ gridColumn: 'span 2' }}>
@@ -243,8 +256,8 @@ const AdminProducts: React.FC = () => {
                 </td>
                 <td style={{ padding: '1rem' }}><span style={{ padding: '0.25rem 0.6rem', background: '#ebf8ff', color: '#2b6cb0', borderRadius: '1rem', fontSize: '0.8rem' }}>{product.category}</span></td>
                 <td style={{ padding: '1rem' }}>
-                  <div style={{ fontWeight: '600' }}>${Number(product.price).toFixed(2)}</div>
-                  {product.oldPrice && <div style={{ fontSize: '0.8rem', color: '#a0aec0', textDecoration: 'line-through' }}>${Number(product.oldPrice).toFixed(2)}</div>}
+                  <div style={{ fontWeight: '600' }}>{formatRs(Number(product.price))}</div>
+                  {product.oldPrice && <div style={{ fontSize: '0.8rem', color: '#a0aec0', textDecoration: 'line-through' }}>{formatRs(Number(product.oldPrice))}</div>}
                 </td>
                 <td style={{ padding: '1rem' }}>{product.badge || '-'}</td>
                 <td style={{ padding: '1rem' }}>

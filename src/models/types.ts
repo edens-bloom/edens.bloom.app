@@ -1,3 +1,13 @@
+export interface ProductPackageTier {
+  [key: string]: string | number | undefined;
+}
+
+export interface ProductPackages {
+  tier1?: ProductPackageTier;
+  tier2?: ProductPackageTier;
+  tier3?: ProductPackageTier;
+}
+
 export interface Product {
   id: number;
   name: string;
@@ -6,13 +16,20 @@ export interface Product {
   category: string;
   image: string;
   plasticBagImage?: string;
+  plasticBagTitle?: string;
+  plasticBagPrice?: number;
   paperBagImage?: string;
+  paperBagTitle?: string;
+  paperBagPrice?: number;
   noBagImage?: string;
+  noBagTitle?: string;
+  noBagPrice?: number;
   badge?: string;
   rating: number;
   reviews: number;
   description: string;
   icon?: string;
+  packages?: ProductPackages;
 }
 
 export interface CartItem extends Product {

@@ -1,54 +1,159 @@
-import React from 'react';
-import './Footer.scss';
+import React from "react";
+import { Link } from "react-router-dom";
 
 const Footer: React.FC = () => {
   return (
-    <footer>
-      <div className="footer-grid">
-        <div className="footer-brand">
-          <a href="#" className="nav-logo">Bloom<span>&</span>Co</a>
-          <p>Handcrafted bouquets and artisan floral décor, sourced from sustainable farms and delivered with love.</p>
+    <>
+      <section className="footer-cta">
+        <div className="footer-cta__inner">
+          <div className="footer-cta__copy">
+            <span className="footer-cta__eyebrow">Bespoke Creations</span>
+            <h2 className="footer-cta__title">
+              Bring Your Vision to <em className="footer-cta__title-accent">Bloom</em>
+            </h2>
+            <p className="footer-cta__text">
+              Have a specific bouquet in mind? Send us your inspiration, and our master makers will twist it into reality.
+            </p>
+            <div className="footer-cta__highlight">
+              <span className="material-symbols-outlined">auto_awesome</span>
+              <p>Unique pieces crafted just for you</p>
+            </div>
+          </div>
+          <div className="footer-cta__form-wrap ambient-shadow">
+            <form className="footer-form">
+              <div className="footer-form__row">
+                <div className="footer-form__field">
+                  <label className="footer-form__label" htmlFor="name">
+                    Full Name
+                  </label>
+                  <input
+                    className="footer-form__input"
+                    id="name"
+                    placeholder="Alex Rivers"
+                    required
+                    type="text"
+                  />
+                </div>
+                <div className="footer-form__field">
+                  <label className="footer-form__label" htmlFor="email">
+                    Email Address
+                  </label>
+                  <input
+                    className="footer-form__input"
+                    id="email"
+                    placeholder="alex@example.com"
+                    required
+                    type="email"
+                  />
+                </div>
+              </div>
+              <div className="footer-form__field">
+                <label className="footer-form__label" htmlFor="description">
+                  Design Description
+                </label>
+                <textarea
+                  className="footer-form__textarea"
+                  id="description"
+                  placeholder="Tell us about the colors, shapes, or occasion..."
+                  rows={4}
+                />
+              </div>
+              <div className="footer-form__field">
+                <span className="footer-form__label">Upload Inspiration Image</span>
+                <label className="footer-form__upload">
+                  <div className="footer-form__upload-inner">
+                    <span className="material-symbols-outlined">cloud_upload</span>
+                    <p className="footer-form__upload-hint">Click to upload or drag and drop</p>
+                    <p className="footer-form__upload-meta">PNG, JPG or PDF (max. 5MB)</p>
+                  </div>
+                  <input className="footer-form__file" type="file" />
+                </label>
+              </div>
+              <button className="footer-form__submit ambient-shadow ambient-shadow-hover press-effect" type="submit">
+                Submit Request
+              </button>
+            </form>
+          </div>
         </div>
-        <div className="footer-col">
-          <h4>Shop</h4>
-          <ul>
-            <li><a href="#">Fresh Bouquets</a></li>
-            <li><a href="#">Seasonal</a></li>
-            <li><a href="#">Home Décor</a></li>
-            <li><a href="#">Wedding</a></li>
-            <li><a href="#">Dried Flowers</a></li>
-          </ul>
+      </section>
+
+      <footer className="site-footer">
+        <div className="site-footer__brand-block">
+          <div className="site-footer__brand">Edens Bloom</div>
+          <p className="site-footer__desc">
+            Handcrafted bouquets and artisan floral décor, sourced from sustainable farms and delivered with love. Everlasting handcrafted artistry for your home.
+          </p>
+          <div className="site-footer__social">
+            <a className="site-footer__social-link" href="#">
+              ig
+            </a>
+            <a className="site-footer__social-link" href="#">
+              pt
+            </a>
+            <a className="site-footer__social-link" href="#">
+              fb
+            </a>
+          </div>
         </div>
-        <div className="footer-col">
-          <h4>Help</h4>
-          <ul>
-            <li><a href="#">Delivery Info</a></li>
-            <li><a href="#">Care Guide</a></li>
-            <li><a href="#">Returns</a></li>
-            <li><a href="#">FAQs</a></li>
-            <li><a href="#">Contact Us</a></li>
-          </ul>
+        <div className="site-footer__nav">
+          <div>
+            <h4 className="site-footer__col-title">Shop</h4>
+            <ul className="site-footer__links">
+              <li>
+                <Link to="/">Fresh Bouquets</Link>
+              </li>
+              <li>
+                <Link to="/">Seasonal</Link>
+              </li>
+              <li>
+                <Link to="/">Home Décor</Link>
+              </li>
+              <li>
+                <Link to="/">DIY Kits</Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="site-footer__col-title">Help</h4>
+            <ul className="site-footer__links">
+              <li>
+                <Link to="/">Delivery Info</Link>
+              </li>
+              <li>
+                <Link to="/">Care Guide</Link>
+              </li>
+              <li>
+                <Link to="/">Returns</Link>
+              </li>
+              <li>
+                <Link to="/">FAQs</Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="site-footer__col-title">Company</h4>
+            <ul className="site-footer__links">
+              <li>
+                <Link to="/">About Us</Link>
+              </li>
+              <li>
+                <Link to="/">Sustainability</Link>
+              </li>
+              <li>
+                <Link to="/">Terms</Link>
+              </li>
+              <li>
+                <Link to="/">Privacy</Link>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div className="footer-col">
-          <h4>Company</h4>
-          <ul>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Sustainability</a></li>
-            <li><a href="#">Our Farms</a></li>
-            <li><a href="#">Press</a></li>
-            <li><a href="#">Careers</a></li>
-          </ul>
-        </div>
+      </footer>
+      <div className="site-footer__bar">
+        <span>© 2026 Edens Bloom. Everlasting Handcrafted Artistry.</span>
+        <span>Designed with ♡ for Makers</span>
       </div>
-      <div className="footer-bottom">
-        <p>© 2026 Bloom & Co. All rights reserved.</p>
-        <div className="footer-social">
-          <a href="#" className="social-link" aria-label="Instagram">ig</a>
-          <a href="#" className="social-link" aria-label="Pinterest">pt</a>
-          <a href="#" className="social-link" aria-label="Facebook">fb</a>
-        </div>
-      </div>
-    </footer>
+    </>
   );
 };
 

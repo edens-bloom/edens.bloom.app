@@ -1,46 +1,60 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../store/useStore';
-import { Search, Heart, ShoppingBag, User } from 'lucide-react';
-import './Navbar.scss';
 
 const Navbar: React.FC = () => {
-  const { getCartCount, wishlist, user, logout } = useStore();
+  const { getCartCount, user, logout } = useStore();
 
   return (
-    <nav className="navbar">
-      <Link to="/" className="nav-logo">
-        Bloom<span>&</span>Co
-      </Link>
-      <ul className="nav-links">
-        <li><Link to="/">Shop</Link></li>
-        <li><Link to="/">Occasions</Link></li>
-        {user?.role === 'admin' && <li><Link to="/product" style={{ color: '#c53030', fontWeight: '600' }}>Manage</Link></li>}
-        <li><Link to="/">About</Link></li>
-      </ul>
-      <div className="nav-icons">
-        <button aria-label="Search">
-          <Search size={18} />
-        </button>
-        <button aria-label="Wishlist" className="wishlist-btn">
-          <Heart size={18} fill={wishlist.length > 0 ? 'currentColor' : 'none'} />
-          {wishlist.length > 0 && <span className="badge">{wishlist.length}</span>}
-        </button>
-        <Link to="/cart" className="cart-btn" aria-label="Cart">
-          <ShoppingBag size={18} />
-          <span className="cart-text">Cart ({getCartCount()})</span>
+    <nav className="site-nav">
+      <div className="site-nav__inner">
+        <Link to="/" className="site-nav__brand">
+          Edens Bloom
         </Link>
-        
-        {user ? (
-          <div className="user-menu">
-            <span className="username">{user.username}</span>
-            <button onClick={logout} className="logout-btn">Logout</button>
-          </div>
-        ) : (
-          <Link to="/login" className="login-btn" title="Admin Login">
-            <User size={18} />
+        <div className="site-nav__links">
+          <Link to="/" className="site-nav__link site-nav__link--active">
+            Shop
           </Link>
-        )}
+          <Link to="/#occasions" className="site-nav__link">
+            Occasions
+          </Link>
+          <Link to="/" className="site-nav__link">
+            About
+          </Link>
+          {user?.role === 'admin' && (
+            <Link to="/product" className="site-nav__link site-nav__link--danger">
+              Manage
+            </Link>
+          )}
+        </div>
+        <div className="site-nav__actions">
+          <button type="button" className="site-nav__icon-btn site-nav__icon-btn--search material-symbols-outlined press-effect" aria-label="Search">
+            search
+          </button>
+
+          <Link to="/cart" className="site-nav__cart press-effect" aria-label="Cart">
+            <span className="material-symbols-outlined">shopping_cart</span>
+            {getCartCount() > 0 && (
+              <span className="site-nav__cart-badge">{getCartCount()}</span>
+            )}
+          </Link>
+
+          {user ? (
+            <div className="site-nav__user">
+              <span className="site-nav__username">{user.username}</span>
+              <button type="button" onClick={logout} className="site-nav__logout">
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link to="/login" className="site-nav__icon-btn material-symbols-outlined press-effect" title="Admin Login">
+              person
+            </Link>
+          )}
+          <button type="button" className="site-nav__icon-btn site-nav__icon-btn--menu material-symbols-outlined" aria-label="Open menu">
+            menu
+          </button>
+        </div>
       </div>
     </nav>
   );

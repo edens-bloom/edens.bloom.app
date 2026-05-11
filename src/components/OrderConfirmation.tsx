@@ -1,5 +1,6 @@
 import React from 'react';
 import { CheckCircle, Home, ShoppingBag } from 'lucide-react';
+import { formatRs } from '../utils/formatRs';
 import './OrderConfirmation.scss';
 
 interface OrderConfirmationProps {
@@ -28,7 +29,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ onClose, onConfir
             </div>
             <div className="detail-row">
               <span>Total Amount</span>
-              <span className="amount">${total.toFixed(2)}</span>
+              <span className="amount">{formatRs(total)}</span>
             </div>
           </div>
           

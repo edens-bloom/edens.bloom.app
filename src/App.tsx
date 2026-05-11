@@ -30,9 +30,9 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <div className="app-container">
+      <div className="app-shell">
         <Navbar />
-        <main>
+        <main className="main-content">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/cart" element={<Cart />} />
