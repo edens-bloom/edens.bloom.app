@@ -12,6 +12,7 @@ import Home from "./pages/Home";
 import Cart from "./pages/Cart";
 import Login from "./pages/Login";
 import AdminProducts from "./pages/AdminProducts";
+import ProductDetail from "./pages/ProductDetail";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user } = useStore();
@@ -35,6 +36,7 @@ const App: React.FC = () => {
         <main className="main-content">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/item/:id" element={<ProductDetail />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/login" element={<Login />} />
             <Route

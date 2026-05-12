@@ -53,7 +53,7 @@ export interface BloomState {
   error: string | null;
   fetchProducts: () => Promise<void>;
   fetchCart: () => Promise<void>;
-  addToCart: (product: Product) => Promise<void>;
+  addToCart: (product: Product, quantity?: number) => Promise<void>;
   removeFromCart: (productId: number) => Promise<void>;
   updateQuantity: (productId: number, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;

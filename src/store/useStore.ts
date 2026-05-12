@@ -35,18 +35,19 @@ export const useStore = create<BloomState>((set, get) => ({
   // No longer needed but kept for interface compatibility
   fetchCart: async () => {},
 
-  addToCart: async (product) => {
+  addToCart: async (product, quantity = 1) => {
+    const qty = Math.max(1, Math.floor(Number(quantity) || 1));
     set((state) => {
       const existing = state.cart.find((item) => item.id === product.id);
       let newCart;
       if (existing) {
         newCart = state.cart.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, ...product, quantity: item.quantity + qty }
             : item,
         );
       } else {
-        newCart = [...state.cart, { ...product, quantity: 1 }];
+        newCart = [...state.cart, { ...product, quantity: qty }];
       }
       saveCart(newCart);
       return { cart: newCart };

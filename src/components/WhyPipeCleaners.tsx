@@ -2,7 +2,7 @@ import React from "react";
 
 const WhyPipeCleaners: React.FC = () => {
   return (
-    <section className="why-section">
+    <section className="why-section" id="tutorials">
       <div className="why-section__inner">
         <div className="why-section__cards">
           <div className="why-section__col">

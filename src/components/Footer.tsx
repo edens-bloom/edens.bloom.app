@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const Footer: React.FC = () => {
   return (
     <>
-      <section className="footer-cta">
+      <section className="footer-cta" id="bespoke-creations">
         <div className="footer-cta__inner">
           <div className="footer-cta__copy">
             <span className="footer-cta__eyebrow">Bespoke Creations</span>

@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useStore } from "../store/useStore";
 import { Loader2, ShoppingBag } from "lucide-react";
 import type { Product } from "../models/types";
@@ -64,13 +65,17 @@ const ProductGrid: React.FC = () => {
           return (
             <div key={product.id} className="product-card fade-up visible">
               <div className="product-card__media ambient-shadow felt-texture">
-                <img src={tier1Image} alt={product.name} />
+                <Link to={`/item/${product.id}`} className="product-card__media-link" aria-label={`View ${product.name}`}>
+                  <img src={tier1Image} alt={product.name} />
+                </Link>
                 {product.badge && <span className="product-card__badge">{product.badge}</span>}
                 <div className="product-card__overlay">
                   <button
                     type="button"
                     className="product-card__add ambient-shadow press-effect"
                     onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       const btn = e.currentTarget;
                       const originalHTML = btn.innerHTML;
                       btn.innerHTML = "<span>Added ✓</span>";
@@ -91,7 +96,7 @@ const ProductGrid: React.FC = () => {
                 </div>
               </div>
 
-              <div>
+              <Link to={`/item/${product.id}`} className="product-card__meta-link">
                 <h4 className="product-card__title" title={product.name}>
                   {product.name}
                 </h4>
@@ -103,7 +108,7 @@ const ProductGrid: React.FC = () => {
                     )}
                   </div>
                 </div>
-              </div>
+              </Link>
             </div>
           );
         })}
