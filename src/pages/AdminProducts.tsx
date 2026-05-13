@@ -14,6 +14,9 @@ import {
 } from "lucide-react";
 import { formatRs } from "../utils/formatRs";
 import type { Product } from "../models/types";
+import compressImage from "../utils/compress";
+import INITIAL_ADDONS from "../constants/add-ons";
+import PRODUCT_PACKAGE from "../constants/product-package";
 
 interface PackageItem {
   id: string;
@@ -40,38 +43,8 @@ const AdminProducts: React.FC = () => {
   const [showAddonsDropdown, setShowAddonsDropdown] = useState(false);
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
   const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
-  const [packages, setPackages] = useState<PackageItem[]>([
-    { id: "1", label: "", price: "", file: null, preview: null },
-    { id: "2", label: "", price: "", file: null, preview: null },
-    { id: "3", label: "", price: "", file: null, preview: null },
-  ]);
-  const [addons, setAddons] = useState<AddonItem[]>([
-    {
-      id: "1",
-      label: "Paper Bag",
-      price: "",
-      isDefault: false,
-      file: null,
-      preview: null,
-    },
-    {
-      id: "2",
-      label: "Plastic Bag",
-      price: "",
-      isDefault: false,
-      file: null,
-      preview: null,
-    },
-    {
-      id: "3",
-      label: "No Bag",
-      price: "",
-      isDefault: true,
-      file: null,
-      preview: null,
-    },
-  ]);
-
+  const [packages, setPackages] = useState<PackageItem[]>(PRODUCT_PACKAGE);
+  const [addons, setAddons] = useState<AddonItem[]>(INITIAL_ADDONS);
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -100,12 +73,14 @@ const AdminProducts: React.FC = () => {
       e.target.files[0]
     ) {
       const file = e.target.files[0];
-      const reader = new FileReader();
 
       if (name === "mainImage") {
-        setMainImageFile(file);
-        reader.onloadend = () => setMainImagePreview(reader.result as string);
-        reader.readAsDataURL(file);
+        compressImage(file).then((compressedFile) => {
+          setMainImageFile(compressedFile);
+          const reader = new FileReader();
+          reader.onloadend = () => setMainImagePreview(reader.result as string);
+          reader.readAsDataURL(compressedFile);
+        });
         return;
       }
     }
@@ -127,19 +102,21 @@ const AdminProducts: React.FC = () => {
 
   const handlePackageFileChange = (index: number, file: File | null) => {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPackages((prev) => {
-        const updated = [...prev];
-        updated[index] = {
-          ...updated[index],
-          file,
-          preview: reader.result as string,
-        };
-        return updated;
-      });
-    };
-    reader.readAsDataURL(file);
+    compressImage(file).then((compressedFile) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPackages((prev) => {
+          const updated = [...prev];
+          updated[index] = {
+            ...updated[index],
+            file: compressedFile,
+            preview: reader.result as string,
+          };
+          return updated;
+        });
+      };
+      reader.readAsDataURL(compressedFile);
+    });
   };
 
   const handleAddonChange = (
@@ -163,19 +140,21 @@ const AdminProducts: React.FC = () => {
 
   const handleAddonFileChange = (index: number, file: File | null) => {
     if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setAddons((prev) => {
-        const updated = [...prev];
-        updated[index] = {
-          ...updated[index],
-          file,
-          preview: reader.result as string,
-        };
-        return updated;
-      });
-    };
-    reader.readAsDataURL(file);
+    compressImage(file).then((compressedFile) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAddons((prev) => {
+          const updated = [...prev];
+          updated[index] = {
+            ...updated[index],
+            file: compressedFile,
+            preview: reader.result as string,
+          };
+          return updated;
+        });
+      };
+      reader.readAsDataURL(compressedFile);
+    });
   };
 
   const addAddon = () => {
@@ -238,55 +217,25 @@ const AdminProducts: React.FC = () => {
         data.append(`addonImage_${idx}`, addon.file);
       }
     });
-
     const success = await addProduct(data as unknown as Product);
 
-    if (success) {
-      setShowForm(false);
-      setMainImageFile(null);
-      setMainImagePreview(null);
-      setFormData({
-        name: "",
-        price: "",
-        oldPrice: "",
-        category: "Roses",
-        badge: "",
-        rating: "5",
-        description: "",
-        inStock: "true",
-      });
-      setPackages([
-        { id: "1", label: "", price: "", file: null, preview: null },
-        { id: "2", label: "", price: "", file: null, preview: null },
-        { id: "3", label: "", price: "", file: null, preview: null },
-      ]);
-      setAddons([
-        {
-          id: "1",
-          label: "Paper Bag",
-          price: "",
-          isDefault: false,
-          file: null,
-          preview: null,
-        },
-        {
-          id: "2",
-          label: "Plastic Bag",
-          price: "",
-          isDefault: false,
-          file: null,
-          preview: null,
-        },
-        {
-          id: "3",
-          label: "No Bag",
-          price: "",
-          isDefault: true,
-          file: null,
-          preview: null,
-        },
-      ]);
-    }
+    // if (success) {
+    //   setShowForm(false);
+    //   setMainImageFile(null);
+    //   setMainImagePreview(null);
+    //   setFormData({
+    //     name: "",
+    //     price: "",
+    //     oldPrice: "",
+    //     category: "Roses",
+    //     badge: "",
+    //     rating: "5",
+    //     description: "",
+    //     inStock: "true",
+    //   });
+    //   setPackages(PRODUCT_PACKAGE);
+    //   setAddons(INITIAL_ADDONS);
+    // }
   };
 
   return (
