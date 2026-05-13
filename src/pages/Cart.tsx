@@ -24,9 +24,9 @@ const Cart: React.FC = () => {
       tier3: "Premium",
     };
 
-    const titleValue = tierData?.[`${tier}Title`];
-    const priceValue = tierData?.[`${tier}Price`];
-    const imageValue = tierData?.[`${tier}ImageUrl`];
+    const titleValue = tierData?.label;
+    const priceValue = tierData?.price;
+    const imageValue = tierData?.image;
 
     return {
       title:

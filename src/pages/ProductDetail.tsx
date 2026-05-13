@@ -8,13 +8,13 @@ import "./ProductDetail.scss";
 
 const getTierPrice = (product: Product, tier: "tier1" | "tier2" | "tier3") => {
   const tierData = product.packages?.[tier];
-  const tierPrice = tierData?.[`${tier}Price`];
+  const tierPrice = tierData?.price;
   return Number(tierPrice ?? product.price);
 };
 
 const getTierImage = (product: Product, tier: "tier1" | "tier2" | "tier3") => {
   const tierData = product.packages?.[tier];
-  const tierImage = tierData?.[`${tier}ImageUrl`];
+  const tierImage = tierData?.image;
   return typeof tierImage === "string" ? tierImage : product.image;
 };
 
@@ -58,7 +58,10 @@ const ProductDetail: React.FC = () => {
     return products.find((p) => p.id === numId);
   }, [numId, products]);
 
-  const images = useMemo(() => (product ? galleryImages(product) : []), [product]);
+  const images = useMemo(
+    () => (product ? galleryImages(product) : []),
+    [product],
+  );
   const mainImage = images[thumbIndex] ?? "";
 
   useEffect(() => {
@@ -77,7 +80,11 @@ const ProductDetail: React.FC = () => {
     document.title = `${product.name} | Edens Bloom`;
   }, [product]);
 
-  if (!isLoading && products.length > 0 && (!Number.isFinite(numId) || numId < 1 || !product)) {
+  if (
+    !isLoading &&
+    products.length > 0 &&
+    (!Number.isFinite(numId) || numId < 1 || !product)
+  ) {
     return <Navigate to="/" replace />;
   }
 
@@ -86,7 +93,11 @@ const ProductDetail: React.FC = () => {
       <div className="product-detail">
         <div className="product-detail__missing page-container">
           <p>No products available.</p>
-          <Link to="/" className="product-detail__back" style={{ marginTop: "1rem" }}>
+          <Link
+            to="/"
+            className="product-detail__back"
+            style={{ marginTop: "1rem" }}
+          >
             <ChevronLeft size={18} aria-hidden />
             Back to shop
           </Link>
@@ -106,8 +117,10 @@ const ProductDetail: React.FC = () => {
   const unit = getTierPrice(product, "tier1");
   const tier2 = product.packages?.tier2;
   const tier3 = product.packages?.tier3;
-  const bundle5Total = tier2?.tier2Price != null ? Number(tier2.tier2Price) : unit * 5;
-  const bundle10Total = tier3?.tier3Price != null ? Number(tier3.tier3Price) : unit * 10;
+  const bundle5Total =
+    tier2?.price != null ? Number(tier2.price) : unit * 5;
+  const bundle10Total =
+    tier3?.price != null ? Number(tier3.price) : unit * 10;
   const save5 = Math.max(0, unit * 6 - bundle5Total);
   const save10 = Math.max(0, unit * 13 - bundle10Total);
 
@@ -119,12 +132,12 @@ const ProductDetail: React.FC = () => {
         : Number(product.noBagPrice ?? 0);
 
   const bundleTitle5 =
-    typeof tier2?.tier2Title === "string" && tier2.tier2Title.trim()
-      ? String(tier2.tier2Title)
+    typeof tier2?.label === "string" && tier2.label.trim()
+      ? String(tier2.label)
       : "Buy 5 Get 1 Free";
   const bundleTitle10 =
-    typeof tier3?.tier3Title === "string" && tier3.tier3Title.trim()
-      ? String(tier3.tier3Title)
+    typeof tier3?.label === "string" && tier3.label.trim()
+      ? String(tier3.label)
       : "Buy 10 Get 3 Free";
 
   const lineUnitPrice =
@@ -160,11 +173,19 @@ const ProductDetail: React.FC = () => {
           </Link>
           <div className="product-detail__main-img-wrap ambient-shadow">
             {mainImage ? (
-              <img src={mainImage} alt={product.name} className="product-detail__main-img" />
+              <img
+                src={mainImage}
+                alt={product.name}
+                className="product-detail__main-img"
+              />
             ) : null}
           </div>
           {images.length > 1 && (
-            <div className="product-detail__thumbs" role="tablist" aria-label="Product images">
+            <div
+              className="product-detail__thumbs"
+              role="tablist"
+              aria-label="Product images"
+            >
               {images.map((src, i) => (
                 <button
                   key={`${src}-${i}`}
@@ -183,10 +204,22 @@ const ProductDetail: React.FC = () => {
 
         <div className="product-detail__info">
           <div className="product-detail__meta-row">
-            {product.badge ? <span className="product-detail__badge">{product.badge}</span> : null}
-            <div className="product-detail__stars" aria-label={`${product.rating} out of 5 stars`}>
+            {product.badge ? (
+              <span className="product-detail__badge">{product.badge}</span>
+            ) : null}
+            <div
+              className="product-detail__stars"
+              aria-label={`${product.rating} out of 5 stars`}
+            >
               {Array.from({ length: 5 }, (_, i) => (
-                <span key={i} className={i < fullStars ? "product-detail__star" : "product-detail__star product-detail__star--muted"}>
+                <span
+                  key={i}
+                  className={
+                    i < fullStars
+                      ? "product-detail__star"
+                      : "product-detail__star product-detail__star--muted"
+                  }
+                >
                   ★
                 </span>
               ))}
@@ -207,27 +240,49 @@ const ProductDetail: React.FC = () => {
               >
                 <div className="product-detail__bundle-title">Single stem</div>
                 <div className="product-detail__bundle-sub">Pay per piece</div>
-                <div className="product-detail__bundle-price">{formatRs(unit + packFee)}</div>
+                <div className="product-detail__bundle-price">
+                  {formatRs(unit + packFee)}
+                </div>
               </button>
               <button
                 type="button"
                 className={`product-detail__bundle${bundle === "bundle5" ? " product-detail__bundle--active" : ""}`}
                 onClick={() => setBundle("bundle5")}
               >
-                {save5 > 0 ? <span className="product-detail__bundle-save">Save {formatRs(save5)}</span> : null}
-                <div className="product-detail__bundle-title">{bundleTitle5}</div>
-                <div className="product-detail__bundle-sub">Best for a full bouquet</div>
-                <div className="product-detail__bundle-price">{formatRs(bundle5Total + packFee)}</div>
+                {save5 > 0 ? (
+                  <span className="product-detail__bundle-save">
+                    Save {formatRs(save5)}
+                  </span>
+                ) : null}
+                <div className="product-detail__bundle-title">
+                  {bundleTitle5}
+                </div>
+                <div className="product-detail__bundle-sub">
+                  Best for a full bouquet
+                </div>
+                <div className="product-detail__bundle-price">
+                  {formatRs(bundle5Total + packFee)}
+                </div>
               </button>
               <button
                 type="button"
                 className={`product-detail__bundle${bundle === "bundle10" ? " product-detail__bundle--active" : ""}`}
                 onClick={() => setBundle("bundle10")}
               >
-                {save10 > 0 ? <span className="product-detail__bundle-save">Save {formatRs(save10)}</span> : null}
-                <div className="product-detail__bundle-title">{bundleTitle10}</div>
-                <div className="product-detail__bundle-sub">The ultimate garden gift</div>
-                <div className="product-detail__bundle-price">{formatRs(bundle10Total + packFee)}</div>
+                {save10 > 0 ? (
+                  <span className="product-detail__bundle-save">
+                    Save {formatRs(save10)}
+                  </span>
+                ) : null}
+                <div className="product-detail__bundle-title">
+                  {bundleTitle10}
+                </div>
+                <div className="product-detail__bundle-sub">
+                  The ultimate garden gift
+                </div>
+                <div className="product-detail__bundle-price">
+                  {formatRs(bundle10Total + packFee)}
+                </div>
               </button>
             </div>
           </div>
@@ -241,7 +296,9 @@ const ProductDetail: React.FC = () => {
                 onClick={() => setPackaging("none")}
               >
                 <div className="product-detail__pack-label">No bag</div>
-                <div className="product-detail__pack-price">{formatRs(Number(product.noBagPrice ?? 0))}</div>
+                <div className="product-detail__pack-price">
+                  {formatRs(Number(product.noBagPrice ?? 0))}
+                </div>
               </button>
               <button
                 type="button"
@@ -249,7 +306,9 @@ const ProductDetail: React.FC = () => {
                 onClick={() => setPackaging("plastic")}
               >
                 <div className="product-detail__pack-label">Plastic bag</div>
-                <div className="product-detail__pack-price">+{formatRs(Number(product.plasticBagPrice ?? 0))}</div>
+                <div className="product-detail__pack-price">
+                  +{formatRs(Number(product.plasticBagPrice ?? 0))}
+                </div>
               </button>
               <button
                 type="button"
@@ -257,22 +316,38 @@ const ProductDetail: React.FC = () => {
                 onClick={() => setPackaging("paper")}
               >
                 <div className="product-detail__pack-label">Paper bag</div>
-                <div className="product-detail__pack-price">+{formatRs(Number(product.paperBagPrice ?? 0))}</div>
+                <div className="product-detail__pack-price">
+                  +{formatRs(Number(product.paperBagPrice ?? 0))}
+                </div>
               </button>
             </div>
           </div>
 
           <div className="product-detail__qty-row">
             <div className="product-detail__qty">
-              <button type="button" className="product-detail__qty-btn" onClick={() => setQuantity((q) => Math.max(1, q - 1))} aria-label="Decrease quantity">
+              <button
+                type="button"
+                className="product-detail__qty-btn"
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                aria-label="Decrease quantity"
+              >
                 −
               </button>
               <span className="product-detail__qty-val">{quantity}</span>
-              <button type="button" className="product-detail__qty-btn" onClick={() => setQuantity((q) => q + 1)} aria-label="Increase quantity">
+              <button
+                type="button"
+                className="product-detail__qty-btn"
+                onClick={() => setQuantity((q) => q + 1)}
+                aria-label="Increase quantity"
+              >
                 +
               </button>
             </div>
-            <button type="button" className="product-detail__add-btn" onClick={handleAddToCart}>
+            <button
+              type="button"
+              className="product-detail__add-btn"
+              onClick={handleAddToCart}
+            >
               <ShoppingBag size={20} aria-hidden />
               {addedFlash ? "Added to cart" : "Add to cart"}
             </button>

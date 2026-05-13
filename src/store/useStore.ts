@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import type { CartItem, BloomState, Product } from "../models/types";
 import { productService, authService } from "../services";
-import { useNavigate } from "react-router-dom";
 
 export const useStore = create<BloomState>((set, get) => ({
   products: [],
@@ -144,6 +143,51 @@ export const useStore = create<BloomState>((set, get) => ({
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to add product";
+      set({
+        error: errorMessage,
+        isLoading: false,
+      });
+      return false;
+    }
+  },
+
+  updateProduct: async (id: number, productData: Partial<Product>) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await productService.update(id, productData);
+      const updatedProduct = response.data?.product || response;
+
+      set((state) => ({
+        products: state.products.map((p) =>
+          p.id === id ? { ...p, ...updatedProduct } : p,
+        ),
+        isLoading: false,
+      }));
+      return true;
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to update product";
+      set({
+        error: errorMessage,
+        isLoading: false,
+      });
+      return false;
+    }
+  },
+
+  deleteProduct: async (id: number) => {
+    set({ isLoading: true, error: null });
+    try {
+      await productService.delete(id);
+
+      set((state) => ({
+        products: state.products.filter((p) => p.id !== id),
+        isLoading: false,
+      }));
+      return true;
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to delete product";
       set({
         error: errorMessage,
         isLoading: false,

@@ -1,11 +1,22 @@
 export interface ProductPackageTier {
-  [key: string]: string | number | undefined;
+  id?: number | string;
+  label?: string;
+  price?: number | string;
+  image?: string;
 }
 
 export interface ProductPackages {
   tier1?: ProductPackageTier;
   tier2?: ProductPackageTier;
   tier3?: ProductPackageTier;
+}
+
+export interface ProductAddon {
+  id?: number | string;
+  label?: string;
+  price?: number | string;
+  is_default?: boolean;
+  image?: string;
 }
 
 export interface Product {
@@ -30,6 +41,8 @@ export interface Product {
   description: string;
   icon?: string;
   packages?: ProductPackages;
+  addons?: ProductAddon[];
+  inStock?: boolean;
 }
 
 export interface CartItem extends Product {
@@ -63,4 +76,6 @@ export interface BloomState {
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   addProduct: (product: Product) => Promise<boolean>;
+  updateProduct: (id: number, productData: Partial<Product>) => Promise<boolean>;
+  deleteProduct: (id: number) => Promise<boolean>;
 }

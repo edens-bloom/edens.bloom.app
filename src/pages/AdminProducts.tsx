@@ -11,6 +11,7 @@ import {
   ChevronDown,
   ChevronUp,
   X,
+  Pencil,
 } from "lucide-react";
 import { formatRs } from "../utils/formatRs";
 import type { Product } from "../models/types";
@@ -36,9 +37,10 @@ interface AddonItem {
 }
 
 const AdminProducts: React.FC = () => {
-  const { products, fetchProducts, addProduct, isLoading } = useStore();
+  const { products, fetchProducts, addProduct, updateProduct, deleteProduct, isLoading } = useStore();
 
   const [showForm, setShowForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showPackagesDropdown, setShowPackagesDropdown] = useState(false);
   const [showAddonsDropdown, setShowAddonsDropdown] = useState(false);
   const [mainImageFile, setMainImageFile] = useState<File | null>(null);
@@ -55,6 +57,97 @@ const AdminProducts: React.FC = () => {
     description: "",
     inStock: "true",
   });
+
+  const resetForm = () => {
+    setMainImageFile(null);
+    setMainImagePreview(null);
+    setFormData({
+      name: "",
+      price: "",
+      oldPrice: "",
+      category: "Roses",
+      badge: "",
+      rating: "5",
+      description: "",
+      inStock: "true",
+    });
+    setPackages(PRODUCT_PACKAGE);
+    setAddons(INITIAL_ADDONS);
+  };
+
+  const handleEditClick = (product: Product) => {
+    setEditingProduct(product);
+    setShowForm(true);
+    setFormData({
+      name: product.name || "",
+      price: product.price?.toString() || "",
+      oldPrice: product.oldPrice?.toString() || "",
+      category: product.category || "Roses",
+      badge: product.badge || "",
+      rating: product.rating?.toString() || "5",
+      description: product.description || "",
+      inStock: product.inStock?.toString() || "true",
+    });
+    setMainImagePreview(product.image || null);
+
+    // Load packages from tier1, tier2, tier3
+    const pkgList: PackageItem[] = [];
+    if (product.packages?.tier1) {
+      pkgList.push({
+        id: "tier1",
+        label: product.packages.tier1.label || "",
+        price: product.packages.tier1.price?.toString() || "",
+        file: null,
+        preview: product.packages.tier1.image || null,
+      });
+    }
+    if (product.packages?.tier2) {
+      pkgList.push({
+        id: "tier2",
+        label: product.packages.tier2.label || "",
+        price: product.packages.tier2.price?.toString() || "",
+        file: null,
+        preview: product.packages.tier2.image || null,
+      });
+    }
+    if (product.packages?.tier3) {
+      pkgList.push({
+        id: "tier3",
+        label: product.packages.tier3.label || "",
+        price: product.packages.tier3.price?.toString() || "",
+        file: null,
+        preview: product.packages.tier3.image || null,
+      });
+    }
+    setPackages(pkgList.length > 0 ? pkgList : PRODUCT_PACKAGE);
+
+    // Load addons if available
+    if (product.addons && product.addons.length > 0) {
+      setAddons(
+        product.addons.map((addon) => ({
+          id: addon.id?.toString() || Date.now().toString(),
+          label: addon.label || "",
+          price: addon.price?.toString() || "",
+          isDefault: addon.is_default || false,
+          file: null,
+          preview: addon.image || null,
+        }))
+      );
+    }
+  };
+
+  const handleDeleteClick = async (e: React.MouseEvent, productId: number) => {
+    e.stopPropagation();
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      await deleteProduct(productId);
+    }
+  };
+
+  const handleCloseForm = () => {
+    setShowForm(false);
+    setEditingProduct(null);
+    resetForm();
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -217,25 +310,17 @@ const AdminProducts: React.FC = () => {
         data.append(`addonImage_${idx}`, addon.file);
       }
     });
-    const success = await addProduct(data as unknown as Product);
 
-    // if (success) {
-    //   setShowForm(false);
-    //   setMainImageFile(null);
-    //   setMainImagePreview(null);
-    //   setFormData({
-    //     name: "",
-    //     price: "",
-    //     oldPrice: "",
-    //     category: "Roses",
-    //     badge: "",
-    //     rating: "5",
-    //     description: "",
-    //     inStock: "true",
-    //   });
-    //   setPackages(PRODUCT_PACKAGE);
-    //   setAddons(INITIAL_ADDONS);
-    // }
+    let success: boolean;
+    if (editingProduct) {
+      success = await updateProduct(editingProduct.id, data as unknown as Partial<Product>);
+    } else {
+      success = await addProduct(data as unknown as Product);
+    }
+
+    if (success) {
+      handleCloseForm();
+    }
   };
 
   return (
@@ -274,7 +359,7 @@ const AdminProducts: React.FC = () => {
           }}
         >
           <Plus size={20} />
-          {showForm ? "Cancel" : "Add New Product"}
+          {editingProduct ? "Cancel" : "Add New Product"}
         </button>
       </div>
 
@@ -288,7 +373,7 @@ const AdminProducts: React.FC = () => {
             marginBottom: "3rem",
           }}
         >
-          <h2 style={{ marginBottom: "1.5rem" }}>Create New Bouquet</h2>
+          <h2 style={{ marginBottom: "1.5rem" }}>{editingProduct ? "Edit Bouquet" : "Create New Bouquet"}</h2>
           <form
             onSubmit={handleSubmit}
             style={{
@@ -879,7 +964,7 @@ const AdminProducts: React.FC = () => {
                 cursor: "pointer",
               }}
             >
-              {isLoading ? "Creating..." : "Create Product"}
+              {isLoading ? (editingProduct ? "Updating..." : "Creating...") : (editingProduct ? "Update Product" : "Create Product")}
             </button>
           </form>
         </div>
@@ -917,7 +1002,14 @@ const AdminProducts: React.FC = () => {
             {products.map((product) => (
               <tr
                 key={product.id}
-                style={{ borderBottom: "1px solid #edf2f7" }}
+                onClick={() => handleEditClick(product)}
+                style={{
+                  borderBottom: "1px solid #edf2f7",
+                  cursor: "pointer",
+                  transition: "background 0.2s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#f7fafc")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
               >
                 <td
                   style={{
@@ -1008,16 +1100,32 @@ const AdminProducts: React.FC = () => {
                   </div>
                 </td>
                 <td style={{ padding: "1rem" }}>
-                  <button
-                    style={{
-                      color: "#e53e3e",
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    <button
+                      onClick={() => handleEditClick(product)}
+                      style={{
+                        color: "#4a5568",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: "0.25rem",
+                      }}
+                    >
+                      <Pencil size={18} />
+                    </button>
+                    <button
+                      onClick={(e) => handleDeleteClick(e, product.id)}
+                      style={{
+                        color: "#e53e3e",
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: "0.25rem",
+                      }}
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
