@@ -2,7 +2,7 @@ import React from "react";
 
 const CategorySection: React.FC = () => {
   return (
-    <section className="category-section">
+    <section className="category-section" id="category">
       <div className="category-section__header">
         <span className="category-section__eyebrow">Browse by Category</span>
         <h2 className="category-section__title">
