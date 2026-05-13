@@ -1,4 +1,4 @@
-@use '../styles/variables' as *;
+@use "../../styles/variables" as *;
 
 .categories-grid {
   display: grid;
@@ -52,7 +52,11 @@
     .cat-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to top, rgba($dark, 0.7) 0%, rgba($dark, 0.1) 60%);
+      background: linear-gradient(
+        to top,
+        rgba($dark, 0.7) 0%,
+        rgba($dark, 0.1) 60%
+      );
       z-index: 2;
     }
 
@@ -91,32 +95,16 @@
       margin-top: 8px;
       color: white;
       font-size: 0.8rem;
-      transition: background 0.2s, border-color 0.2s;
+      transition:
+        background 0.2s,
+        border-color 0.2s;
     }
   }
 
-  // Fallback colors for variety
-  .cat-roses { background: #e8c4b8; }
-  .cat-seasonal { background: #c8dfc6; }
-  .cat-decor { background: #d4c5a9; }
-  .cat-wedding { background: #e0d0e8; }
-  .cat-tropical { background: #b8d4c8; }
-}
-
-@media (max-width: 900px) {
-  .categories-grid {
-    grid-template-columns: repeat(2, 1fr);
-    .category-card:first-child {
-      grid-column: span 2;
-    }
+  .cat-roses {
+    background: #e8c4b8;
   }
-}
-
-@media (max-width: 600px) {
-  .categories-grid {
-    grid-template-columns: 1fr 1fr;
-    .category-card:first-child {
-      grid-column: span 2;
-    }
+  .cat-seasonal {
+    background: #c8dfc6;
   }
 }

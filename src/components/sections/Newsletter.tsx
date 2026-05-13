@@ -21,17 +21,22 @@ const Newsletter: React.FC = () => {
           {subscribed ? (
             <>
               <h2 className="newsletter__title">
-                Thank you for <em className="newsletter__title-accent">subscribing!</em>
+                Thank you for{" "}
+                <em className="newsletter__title-accent">subscribing!</em>
               </h2>
-              <p className="newsletter__lead">Check your inbox for your 15% discount code.</p>
+              <p className="newsletter__lead">
+                Check your inbox for your 15% discount code.
+              </p>
             </>
           ) : (
             <>
               <h2 className="newsletter__title">
-                Get 15% off your <em className="newsletter__title-accent">first order</em>
+                Get 15% off your{" "}
+                <em className="newsletter__title-accent">first order</em>
               </h2>
               <p className="newsletter__lead">
-                Join our community for seasonal inspiration, exclusive offers &amp; floral tips.
+                Join our community for seasonal inspiration, exclusive offers
+                &amp; floral tips.
               </p>
               <form className="newsletter__form" onSubmit={handleSubmit}>
                 <input
@@ -42,7 +47,10 @@ const Newsletter: React.FC = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
-                <button type="submit" className="newsletter__submit ambient-shadow press-effect">
+                <button
+                  type="submit"
+                  className="newsletter__submit ambient-shadow press-effect"
+                >
                   Subscribe
                 </button>
               </form>

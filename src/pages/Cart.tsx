@@ -2,17 +2,19 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingBag, ArrowRight, Minus, Plus } from "lucide-react";
 import { useStore } from "../store/useStore";
-import OrderConfirmation from "../components/OrderConfirmation";
 import type { Product } from "../models/types";
 import { formatRs } from "../utils/formatRs";
 import "./Cart.scss";
+import { OrderConfirmation } from "../components";
 
 type TierKey = "tier1" | "tier2" | "tier3";
 
 const Cart: React.FC = () => {
   const { cart, removeFromCart, updateQuantity, clearCart } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedTierByItem, setSelectedTierByItem] = useState<Record<number, TierKey>>({});
+  const [selectedTierByItem, setSelectedTierByItem] = useState<
+    Record<number, TierKey>
+  >({});
 
   const getTierData = (item: Product, tier: TierKey) => {
     const tierData = item.packages?.[tier];
@@ -116,7 +118,9 @@ const Cart: React.FC = () => {
                           onClick={() => removeFromCart(item.id)}
                           aria-label={`Remove ${item.name}`}
                         >
-                          <span className="material-symbols-outlined">delete</span>
+                          <span className="material-symbols-outlined">
+                            delete
+                          </span>
                         </button>
                       </div>
 
@@ -132,10 +136,15 @@ const Cart: React.FC = () => {
                               value="tier1"
                               checked={selectedTier === "tier1"}
                               onChange={() =>
-                                setSelectedTierByItem((prev) => ({ ...prev, [item.id]: "tier1" }))
+                                setSelectedTierByItem((prev) => ({
+                                  ...prev,
+                                  [item.id]: "tier1",
+                                }))
                               }
                             />
-                            <span>{tier1.label} ({formatRs(tier1.price)})</span>
+                            <span>
+                              {tier1.label} ({formatRs(tier1.price)})
+                            </span>
                           </label>
 
                           <label
@@ -147,10 +156,15 @@ const Cart: React.FC = () => {
                               value="tier2"
                               checked={selectedTier === "tier2"}
                               onChange={() =>
-                                setSelectedTierByItem((prev) => ({ ...prev, [item.id]: "tier2" }))
+                                setSelectedTierByItem((prev) => ({
+                                  ...prev,
+                                  [item.id]: "tier2",
+                                }))
                               }
                             />
-                            <span>{tier2.label} ({formatRs(tier2.price)})</span>
+                            <span>
+                              {tier2.label} ({formatRs(tier2.price)})
+                            </span>
                           </label>
 
                           <label
@@ -162,10 +176,15 @@ const Cart: React.FC = () => {
                               value="tier3"
                               checked={selectedTier === "tier3"}
                               onChange={() =>
-                                setSelectedTierByItem((prev) => ({ ...prev, [item.id]: "tier3" }))
+                                setSelectedTierByItem((prev) => ({
+                                  ...prev,
+                                  [item.id]: "tier3",
+                                }))
                               }
                             />
-                            <span>{tier3.label} ({formatRs(tier3.price)})</span>
+                            <span>
+                              {tier3.label} ({formatRs(tier3.price)})
+                            </span>
                           </label>
                         </div>
                       </div>
@@ -173,14 +192,18 @@ const Cart: React.FC = () => {
                       <div className="item-footer">
                         <div className="item-quantity">
                           <button
-                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            onClick={() =>
+                              updateQuantity(item.id, item.quantity - 1)
+                            }
                             aria-label="Decrease quantity"
                           >
                             <Minus size={16} />
                           </button>
                           <span>{item.quantity}</span>
                           <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            onClick={() =>
+                              updateQuantity(item.id, item.quantity + 1)
+                            }
                             aria-label="Increase quantity"
                           >
                             <Plus size={16} />
@@ -190,10 +213,12 @@ const Cart: React.FC = () => {
                         <div className="item-price">
                           <p>
                             {selectedTierData.title}: {item.quantity} x{" "}
-                            {formatRs(selectedTierData.price)} = {formatRs(itemTotal)}
+                            {formatRs(selectedTierData.price)} ={" "}
+                            {formatRs(itemTotal)}
                           </p>
                           <p className="item-total-row">
-                            <span>Item Total:</span> <strong>{formatRs(itemTotal)}</strong>
+                            <span>Item Total:</span>{" "}
+                            <strong>{formatRs(itemTotal)}</strong>
                           </p>
                         </div>
                       </div>
@@ -232,8 +257,8 @@ const Cart: React.FC = () => {
                 <div className="sustainability-note">
                   <span className="material-symbols-outlined">eco</span>
                   <p>
-                    Your handcrafted stems support sustainable artistry and reduction
-                    of floral waste.
+                    Your handcrafted stems support sustainable artistry and
+                    reduction of floral waste.
                   </p>
                 </div>
               </div>

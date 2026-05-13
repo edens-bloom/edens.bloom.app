@@ -1,4 +1,4 @@
-@use '../styles/variables' as *;
+@use "../../styles/variables" as *;
 
 .products-grid {
   display: grid;
@@ -10,7 +10,9 @@
     border: 1px solid $border;
     border-radius: $radius;
     overflow: hidden;
-    transition: box-shadow $transition-medium, transform $transition-medium;
+    transition:
+      box-shadow $transition-medium,
+      transform $transition-medium;
     position: relative;
 
     &:hover {
@@ -98,81 +100,6 @@
       font-size: 0.65rem;
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: $rose;
-      margin-bottom: 4px;
     }
-
-    .product-stars {
-      font-size: 0.65rem;
-      color: #d4a853;
-      margin-bottom: 8px;
-      span {
-        color: $muted;
-        margin-left: 4px;
-      }
-    }
-
-    .product-name {
-      font-family: $serif;
-      font-size: 1.2rem;
-      font-weight: 400;
-      color: $dark;
-      margin-bottom: 6px;
-    }
-
-    .product-desc {
-      font-size: 0.8rem;
-      color: $muted;
-      margin-bottom: 12px;
-      line-height: 1.6;
-    }
-
-    .product-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .product-price {
-      font-weight: 500;
-      font-size: 1rem;
-      color: $dark;
-      s {
-        font-weight: 300;
-        color: $muted;
-        font-size: 0.85rem;
-        margin-right: 6px;
-      }
-    }
-
-    .add-to-cart {
-      background: $dark;
-      color: white;
-      padding: 8px 16px;
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      border-radius: 1px;
-
-      &.added {
-        background: $sage;
-      }
-
-      &:hover:not(.added) {
-        background: $rose;
-      }
-    }
-  }
-}
-
-@media (max-width: 900px) {
-  .products-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 600px) {
-  .products-grid {
-    grid-template-columns: 1fr;
   }
 }

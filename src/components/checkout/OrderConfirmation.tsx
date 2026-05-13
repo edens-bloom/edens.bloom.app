@@ -1,7 +1,7 @@
-import React from 'react';
-import { CheckCircle, Home, ShoppingBag } from 'lucide-react';
-import { formatRs } from '../utils/formatRs';
-import './OrderConfirmation.scss';
+import React from "react";
+import { CheckCircle, Home, ShoppingBag } from "lucide-react";
+import { formatRs } from "../../utils/formatRs";
+import "./OrderConfirmation.scss";
 
 interface OrderConfirmationProps {
   onClose: () => void;
@@ -9,7 +9,11 @@ interface OrderConfirmationProps {
   total: number;
 }
 
-const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ onClose, onConfirm, total }) => {
+const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
+  onClose,
+  onConfirm,
+  total,
+}) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -32,9 +36,12 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ onClose, onConfir
               <span className="amount">{formatRs(total)}</span>
             </div>
           </div>
-          
+
           <div className="confirmation-message">
-            <p>We've received your order and we're getting it ready for shipment. You'll receive a confirmation email shortly with tracking details.</p>
+            <p>
+              We've received your order and we're getting it ready for shipment.
+              You'll receive a confirmation email shortly with tracking details.
+            </p>
           </div>
         </div>
 

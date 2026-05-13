@@ -40,7 +40,7 @@ export interface User {
   id: number;
   username: string;
   email: string;
-  role: 'admin' | 'user';
+  role: "admin" | "user";
 }
 
 export interface BloomState {
@@ -62,5 +62,5 @@ export interface BloomState {
   getCartCount: () => number;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
-  addProduct: (product: any) => Promise<boolean>;
+  addProduct: (product: Product) => Promise<boolean>;
 }

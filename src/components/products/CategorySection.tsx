@@ -6,7 +6,8 @@ const CategorySection: React.FC = () => {
       <div className="category-section__header">
         <span className="category-section__eyebrow">Browse by Category</span>
         <h2 className="category-section__title">
-          Find your perfect <em className="category-section__title-accent">arrangement</em>
+          Find your perfect{" "}
+          <em className="category-section__title-accent">arrangement</em>
         </h2>
       </div>
       <div className="category-bento">
@@ -20,7 +21,11 @@ const CategorySection: React.FC = () => {
           <div className="category-tile__content category-tile__content--lg">
             <h3 className="category-tile__heading">Artisan Bouquets</h3>
             <p className="category-tile__meta">48 UNIQUE DESIGNS</p>
-            <button type="button" className="category-tile__btn press-effect" aria-label="View category">
+            <button
+              type="button"
+              className="category-tile__btn press-effect"
+              aria-label="View category"
+            >
               <span className="material-symbols-outlined">arrow_forward</span>
             </button>
           </div>
@@ -34,7 +39,9 @@ const CategorySection: React.FC = () => {
           />
           <div className="category-tile__gradient" />
           <div className="category-tile__content">
-            <h3 className="category-tile__heading category-tile__heading--sm">DIY Kits</h3>
+            <h3 className="category-tile__heading category-tile__heading--sm">
+              DIY Kits
+            </h3>
             <p className="category-tile__meta">LEARN TO TWIST</p>
           </div>
         </div>
@@ -47,7 +54,9 @@ const CategorySection: React.FC = () => {
           />
           <div className="category-tile__gradient" />
           <div className="category-tile__content">
-            <h3 className="category-tile__heading category-tile__heading--sm">Seasonal</h3>
+            <h3 className="category-tile__heading category-tile__heading--sm">
+              Seasonal
+            </h3>
             <p className="category-tile__meta">LIMITED EDITIONS</p>
           </div>
         </div>
@@ -60,7 +69,9 @@ const CategorySection: React.FC = () => {
           />
           <div className="category-tile__gradient" />
           <div className="category-tile__content">
-            <h3 className="category-tile__heading category-tile__heading--sm">Custom Gifts</h3>
+            <h3 className="category-tile__heading category-tile__heading--sm">
+              Custom Gifts
+            </h3>
             <p className="category-tile__meta">MADE JUST FOR THEM</p>
           </div>
         </div>

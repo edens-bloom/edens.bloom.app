@@ -1,13 +1,14 @@
 import React, { useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useStore } from "../store/useStore";
+import { useStore } from "../../store/useStore";
 
 const Navbar: React.FC = () => {
   const location = useLocation();
   const { getCartCount, user, logout, wishlist, toggleWishlist } = useStore();
   const [search, setSearch] = useState("");
 
-  const shopActive = location.pathname === "/" || /^\/item\/\d+/.test(location.pathname);
+  const shopActive =
+    location.pathname === "/" || /^\/item\/\d+/.test(location.pathname);
 
   const detailProductId = useMemo(() => {
     const m = location.pathname.match(/^\/item\/(\d+)/);
@@ -18,7 +19,8 @@ const Navbar: React.FC = () => {
     if (detailProductId != null) toggleWishlist(detailProductId);
   };
 
-  const wishlisted = detailProductId != null && wishlist.includes(detailProductId);
+  const wishlisted =
+    detailProductId != null && wishlist.includes(detailProductId);
 
   return (
     <nav className="site-nav">
@@ -27,7 +29,10 @@ const Navbar: React.FC = () => {
           Edens Bloom
         </Link>
         <div className="site-nav__links">
-          <Link to="/" className={`site-nav__link${shopActive ? " site-nav__link--active" : ""}`}>
+          <Link
+            to="/"
+            className={`site-nav__link${shopActive ? " site-nav__link--active" : ""}`}
+          >
             Shop
           </Link>
           <Link to="/#tutorials" className="site-nav__link">
@@ -37,14 +42,20 @@ const Navbar: React.FC = () => {
             Custom
           </Link>
           {user?.role === "admin" && (
-            <Link to="/product" className="site-nav__link site-nav__link--danger">
+            <Link
+              to="/product"
+              className="site-nav__link site-nav__link--danger"
+            >
               Manage
             </Link>
           )}
         </div>
 
         <div className="site-nav__search-wrap">
-          <span className="material-symbols-outlined site-nav__search-icon" aria-hidden>
+          <span
+            className="material-symbols-outlined site-nav__search-icon"
+            aria-hidden
+          >
             search
           </span>
           <input
@@ -66,9 +77,15 @@ const Navbar: React.FC = () => {
             search
           </button>
 
-          <Link to="/cart" className="site-nav__cart press-effect" aria-label="Cart">
+          <Link
+            to="/cart"
+            className="site-nav__cart press-effect"
+            aria-label="Cart"
+          >
             <span className="material-symbols-outlined">shopping_cart</span>
-            {getCartCount() > 0 && <span className="site-nav__cart-badge">{getCartCount()}</span>}
+            {getCartCount() > 0 && (
+              <span className="site-nav__cart-badge">{getCartCount()}</span>
+            )}
           </Link>
 
           <button
@@ -76,7 +93,11 @@ const Navbar: React.FC = () => {
             className={`site-nav__wishlist material-symbols-outlined press-effect${wishlisted ? " site-nav__wishlist--active" : ""}`}
             onClick={onWishlistClick}
             aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
-            title={detailProductId == null ? "Open a product to use wishlist" : undefined}
+            title={
+              detailProductId == null
+                ? "Open a product to use wishlist"
+                : undefined
+            }
             disabled={detailProductId == null}
           >
             {wishlisted ? "favorite" : "favorite_border"}
@@ -84,17 +105,29 @@ const Navbar: React.FC = () => {
 
           {user ? (
             <div className="site-nav__user">
-              <span className="site-nav__username">{user.username}</span>
-              <button type="button" onClick={logout} className="site-nav__logout">
+              <span className="site-nav__username">{}</span>
+              <button
+                type="button"
+                onClick={logout}
+                className="site-nav__logout"
+              >
                 Logout
               </button>
             </div>
           ) : (
-            <Link to="/login" className="site-nav__icon-btn material-symbols-outlined press-effect" title="Admin Login">
+            <Link
+              to="/login"
+              className="site-nav__icon-btn material-symbols-outlined press-effect"
+              title="Admin Login"
+            >
               person
             </Link>
           )}
-          <button type="button" className="site-nav__icon-btn site-nav__icon-btn--menu material-symbols-outlined" aria-label="Open menu">
+          <button
+            type="button"
+            className="site-nav__icon-btn site-nav__icon-btn--menu material-symbols-outlined"
+            aria-label="Open menu"
+          >
             menu
           </button>
         </div>

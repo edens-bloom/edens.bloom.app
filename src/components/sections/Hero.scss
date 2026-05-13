@@ -1,4 +1,4 @@
-@use "../styles/variables" as *;
+@use "../../styles/variables" as *;
 
 .hero {
   display: grid;
@@ -98,77 +98,6 @@
 
     .hero-image-overlay {
       position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        135deg,
-        rgba($rose, 0.15) 0%,
-        transparent 60%
-      );
     }
-
-    .hero-float-card {
-      position: absolute;
-      bottom: 2.5rem;
-      left: -2rem;
-      background: white;
-      padding: 1rem 1.4rem;
-      box-shadow: 0 8px 32px rgba($dark, 0.12);
-      border-radius: $radius;
-      min-width: 200px;
-      animation: floatUp 0.8s ease 0.3s both;
-    }
-  }
-}
-
-@keyframes floatUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.float-label {
-  font-size: 0.65rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: $muted;
-}
-.float-title {
-  font-family: $serif;
-  font-size: 1.2rem;
-  font-weight: 400;
-  color: $dark;
-  margin: 2px 0;
-}
-.float-price {
-  color: $rose;
-  font-weight: 500;
-  font-size: 0.9rem;
-}
-.float-stars {
-  color: #d4a853;
-  font-size: 0.7rem;
-  margin-top: 4px;
-}
-
-@media (max-width: 900px) {
-  .hero {
-    grid-template-columns: 1fr;
-    .hero-image {
-      min-height: 50vw;
-      .hero-float-card {
-        left: 2rem;
-      }
-    }
-  }
-}
-
-@media (max-width: 600px) {
-  .hero .hero-badges {
-    gap: 1.2rem;
   }
 }

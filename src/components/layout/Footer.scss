@@ -1,4 +1,4 @@
-@use '../styles/variables' as *;
+@use "../../styles/variables" as *;
 
 footer {
   background: #1e1510;
@@ -20,7 +20,10 @@ footer {
     color: white;
     display: block;
     margin-bottom: 1rem;
-    span { color: $rose; font-style: italic; }
+    span {
+      color: $rose;
+      font-style: italic;
+    }
   }
 
   .footer-brand p {
@@ -42,7 +45,9 @@ footer {
     a {
       color: rgba(255, 255, 255, 0.5);
       font-size: 0.82rem;
-      &:hover { color: $rose; }
+      &:hover {
+        color: $rose;
+      }
     }
   }
 

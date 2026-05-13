@@ -1,5 +1,5 @@
 import React from "react";
-import { formatRs } from "../utils/formatRs";
+import { formatRs } from "../../utils/formatRs";
 
 const Hero: React.FC = () => {
   return (
@@ -10,13 +10,18 @@ const Hero: React.FC = () => {
           <span className="hero__eyebrow">New Season Collection</span>
         </div>
         <h1 className="hero__title">
-          Everlasting artistry in <span className="hero__title-accent">every twist</span>
+          Everlasting artistry in{" "}
+          <span className="hero__title-accent">every twist</span>
         </h1>
         <p className="hero__lead">
-          Handcrafted pipe cleaner bouquets and artisan décor, reimagined for the modern maker. Vibrant, flexible, and forever in bloom.
+          Handcrafted pipe cleaner bouquets and artisan décor, reimagined for
+          the modern maker. Vibrant, flexible, and forever in bloom.
         </p>
         <div className="hero__actions">
-          <a href="#occasions" className="btn-primary-solid ambient-shadow ambient-shadow-hover press-effect">
+          <a
+            href="#occasions"
+            className="btn-primary-solid ambient-shadow ambient-shadow-hover press-effect"
+          >
             Shop Now
           </a>
           <a href="#occasions" className="btn-outline-round press-effect">

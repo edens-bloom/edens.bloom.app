@@ -1,4 +1,4 @@
-@use '../styles/variables' as *;
+@use "../../styles/variables" as *;
 
 .strip {
   background: $rose;
@@ -17,7 +17,7 @@
     font-size: 0.72rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    
+
     svg {
       opacity: 0.85;
     }

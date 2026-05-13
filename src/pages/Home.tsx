@@ -1,12 +1,20 @@
-import React from 'react';
-import Hero from '../components/Hero';
-import FeatureStrip from '../components/FeatureStrip';
-import CategorySection from '../components/CategorySection';
-import ProductGrid from '../components/ProductGrid';
-import WhyPipeCleaners from '../components/WhyPipeCleaners';
-import Newsletter from '../components/Newsletter';
+import React, { useEffect } from "react";
+import { useStore } from "../store/useStore";
+import {
+  CategorySection,
+  FeatureStrip,
+  Hero,
+  Newsletter,
+  ProductGrid,
+  WhyPipeCleaners,
+} from "../components";
 
 const Home: React.FC = () => {
+  const { fetchProducts } = useStore();
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
   return (
     <div className="space-y-24">
       <Hero />

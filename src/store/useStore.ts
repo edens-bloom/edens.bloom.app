@@ -1,11 +1,7 @@
 import { create } from "zustand";
-import type { CartItem, BloomState } from "../models/types";
-import apiClient from "../api/apiClient";
-
-// Helper to save cart to localStorage
-const saveCart = (cart: CartItem[]) => {
-  localStorage.setItem("bloom_cart", JSON.stringify(cart));
-};
+import type { CartItem, BloomState, Product } from "../models/types";
+import { productService, authService } from "../services";
+import { useNavigate } from "react-router-dom";
 
 export const useStore = create<BloomState>((set, get) => ({
   products: [],
@@ -19,14 +15,13 @@ export const useStore = create<BloomState>((set, get) => ({
   fetchProducts: async () => {
     set({ isLoading: true, error: null });
     try {
-      const response = await apiClient.get("/products");
-      set({ products: response.data, isLoading: false });
-    } catch (err: any) {
+      const response = await productService.fetchAll();
+      set({ products: response, isLoading: false });
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch products";
       set({
-        error:
-          err.response?.data?.message ||
-          err.message ||
-          "Failed to fetch products",
+        error: errorMessage,
         isLoading: false,
       });
     }
@@ -35,7 +30,7 @@ export const useStore = create<BloomState>((set, get) => ({
   // No longer needed but kept for interface compatibility
   fetchCart: async () => {},
 
-  addToCart: async (product, quantity = 1) => {
+  addToCart: async (product: Product, quantity: number = 1) => {
     const qty = Math.max(1, Math.floor(Number(quantity) || 1));
     set((state) => {
       const existing = state.cart.find((item) => item.id === product.id);
@@ -54,7 +49,7 @@ export const useStore = create<BloomState>((set, get) => ({
     });
   },
 
-  removeFromCart: async (productId) => {
+  removeFromCart: async (productId: number) => {
     set((state) => {
       const newCart = state.cart.filter((item) => item.id !== productId);
       saveCart(newCart);
@@ -62,7 +57,7 @@ export const useStore = create<BloomState>((set, get) => ({
     });
   },
 
-  updateQuantity: async (productId, quantity) => {
+  updateQuantity: async (productId: number, quantity: number) => {
     set((state) => {
       const newCart = state.cart
         .map((item) =>
@@ -81,7 +76,7 @@ export const useStore = create<BloomState>((set, get) => ({
     set({ cart: [] });
   },
 
-  toggleWishlist: (productId) => {
+  toggleWishlist: (productId: number) => {
     set((state) => {
       const newWishlist = state.wishlist.includes(productId)
         ? state.wishlist.filter((id) => id !== productId)
@@ -104,27 +99,25 @@ export const useStore = create<BloomState>((set, get) => ({
     return cart.reduce((count, item) => count + item.quantity, 0);
   },
 
-  login: async (username, password) => {
+  login: async (username: string, password: string) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await apiClient.post("/auth/login", {
-        username,
-        password,
-      });
+      const response = await authService.login(username, password);
 
       const {
         token,
         data: { user },
-      } = response.data;
+      } = response;
 
       localStorage.setItem("bloom_token", token);
       localStorage.setItem("bloom_user", JSON.stringify(user));
 
       set({ user, token, isLoading: false });
       return true;
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Login failed";
       set({
-        error: err.response?.data?.message || err.message || "Login failed",
+        error: errorMessage,
         isLoading: false,
       });
       return false;
@@ -137,24 +130,30 @@ export const useStore = create<BloomState>((set, get) => ({
     set({ user: null, token: null });
   },
 
-  addProduct: async (productData) => {
+  addProduct: async (productData: Product) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await apiClient.post("/products", productData);
-      const newProduct = response.data.data.product;
+      const response = await productService.create(productData);
+      const newProduct = response.data?.product || response;
 
       set((state) => ({
         products: [...state.products, newProduct],
         isLoading: false,
       }));
       return true;
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to add product";
       set({
-        error:
-          err.response?.data?.message || err.message || "Failed to add product",
+        error: errorMessage,
         isLoading: false,
       });
       return false;
     }
   },
 }));
+
+// Helper to save cart to localStorage
+const saveCart = (cart: CartItem[]) => {
+  localStorage.setItem("bloom_cart", JSON.stringify(cart));
+};

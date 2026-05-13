@@ -9,10 +9,12 @@ const Footer: React.FC = () => {
           <div className="footer-cta__copy">
             <span className="footer-cta__eyebrow">Bespoke Creations</span>
             <h2 className="footer-cta__title">
-              Bring Your Vision to <em className="footer-cta__title-accent">Bloom</em>
+              Bring Your Vision to{" "}
+              <em className="footer-cta__title-accent">Bloom</em>
             </h2>
             <p className="footer-cta__text">
-              Have a specific bouquet in mind? Send us your inspiration, and our master makers will twist it into reality.
+              Have a specific bouquet in mind? Send us your inspiration, and our
+              master makers will twist it into reality.
             </p>
             <div className="footer-cta__highlight">
               <span className="material-symbols-outlined">auto_awesome</span>
@@ -59,17 +61,28 @@ const Footer: React.FC = () => {
                 />
               </div>
               <div className="footer-form__field">
-                <span className="footer-form__label">Upload Inspiration Image</span>
+                <span className="footer-form__label">
+                  Upload Inspiration Image
+                </span>
                 <label className="footer-form__upload">
                   <div className="footer-form__upload-inner">
-                    <span className="material-symbols-outlined">cloud_upload</span>
-                    <p className="footer-form__upload-hint">Click to upload or drag and drop</p>
-                    <p className="footer-form__upload-meta">PNG, JPG or PDF (max. 5MB)</p>
+                    <span className="material-symbols-outlined">
+                      cloud_upload
+                    </span>
+                    <p className="footer-form__upload-hint">
+                      Click to upload or drag and drop
+                    </p>
+                    <p className="footer-form__upload-meta">
+                      PNG, JPG or PDF (max. 5MB)
+                    </p>
                   </div>
                   <input className="footer-form__file" type="file" />
                 </label>
               </div>
-              <button className="footer-form__submit ambient-shadow ambient-shadow-hover press-effect" type="submit">
+              <button
+                className="footer-form__submit ambient-shadow ambient-shadow-hover press-effect"
+                type="submit"
+              >
                 Submit Request
               </button>
             </form>
@@ -81,7 +94,9 @@ const Footer: React.FC = () => {
         <div className="site-footer__brand-block">
           <div className="site-footer__brand">Edens Bloom</div>
           <p className="site-footer__desc">
-            Handcrafted bouquets and artisan floral décor, sourced from sustainable farms and delivered with love. Everlasting handcrafted artistry for your home.
+            Handcrafted bouquets and artisan floral décor, sourced from
+            sustainable farms and delivered with love. Everlasting handcrafted
+            artistry for your home.
           </p>
           <div className="site-footer__social">
             <a className="site-footer__social-link" href="#">

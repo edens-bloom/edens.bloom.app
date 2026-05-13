@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useStore } from "../store/useStore";
+import { useStore } from "../../store/useStore";
 import { Loader2, ShoppingBag } from "lucide-react";
-import type { Product } from "../models/types";
-import { formatRs } from "../utils/formatRs";
+import type { Product } from "../../models/types";
+import { formatRs } from "../../utils/formatRs";
 
 const getTierPrice = (product: Product, tier: "tier1" | "tier2" | "tier3") => {
   const tierData = product.packages?.[tier];
@@ -37,7 +37,11 @@ const ProductGrid: React.FC = () => {
     return (
       <div className="page-container product-grid__state product-grid__state--error">
         <p className="type-label-md">Oops! {error}</p>
-        <button type="button" onClick={() => fetchProducts()} className="product-grid__retry">
+        <button
+          type="button"
+          onClick={() => fetchProducts()}
+          className="product-grid__retry"
+        >
           Try Again
         </button>
       </div>
@@ -65,10 +69,16 @@ const ProductGrid: React.FC = () => {
           return (
             <div key={product.id} className="product-card fade-up visible">
               <div className="product-card__media ambient-shadow felt-texture">
-                <Link to={`/item/${product.id}`} className="product-card__media-link" aria-label={`View ${product.name}`}>
+                <Link
+                  to={`/item/${product.id}`}
+                  className="product-card__media-link"
+                  aria-label={`View ${product.name}`}
+                >
                   <img src={tier1Image} alt={product.name} />
                 </Link>
-                {product.badge && <span className="product-card__badge">{product.badge}</span>}
+                {product.badge && (
+                  <span className="product-card__badge">{product.badge}</span>
+                )}
                 <div className="product-card__overlay">
                   <button
                     type="button"
@@ -96,15 +106,28 @@ const ProductGrid: React.FC = () => {
                 </div>
               </div>
 
-              <Link to={`/item/${product.id}`} className="product-card__meta-link">
+              <Link
+                to={`/item/${product.id}`}
+                className="product-card__meta-link"
+              >
                 <h4 className="product-card__title" title={product.name}>
                   {product.name}
                 </h4>
                 <div className="product-card__price-row">
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <span className="product-card__price">{formatRs(tier1Price)}</span>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                    }}
+                  >
+                    <span className="product-card__price">
+                      {formatRs(tier1Price)}
+                    </span>
                     {product.oldPrice && (
-                      <span className="product-card__old-price">{formatRs(Number(product.oldPrice))}</span>
+                      <span className="product-card__old-price">
+                        {formatRs(Number(product.oldPrice))}
+                      </span>
                     )}
                   </div>
                 </div>
