@@ -154,7 +154,9 @@
   color: $color-primary;
   padding: 0.5rem;
   border-radius: $radius-pill;
-  transition: color $transition-fast, background $transition-fast;
+  transition:
+    color $transition-fast,
+    background $transition-fast;
 
   &:disabled {
     opacity: 0.35;
@@ -378,7 +380,9 @@
   justify-content: center;
   gap: 0.5rem;
   text-decoration: none;
-  transition: box-shadow $transition-medium, transform $transition-medium;
+  transition:
+    box-shadow $transition-medium,
+    transform $transition-medium;
 }
 
 .btn-outline-round {
@@ -391,7 +395,9 @@
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  transition: background $transition-fast, color $transition-fast;
+  transition:
+    background $transition-fast,
+    color $transition-fast;
 
   &:hover {
     background: $color-primary-container;
@@ -597,7 +603,12 @@
 .category-tile__gradient {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba($color-on-background, 0.8), transparent, transparent);
+  background: linear-gradient(
+    to top,
+    rgba($color-on-background, 0.8),
+    transparent,
+    transparent
+  );
   pointer-events: none;
 }
 
@@ -702,7 +713,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background $transition-fast, color $transition-fast;
+  transition:
+    background $transition-fast,
+    color $transition-fast;
 
   &:hover {
     background: $color-primary-container;
@@ -765,26 +778,22 @@
 }
 
 .product-card {
+  padding: 20px 10px;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 5px;
+  transition: box-shadow 0.3s ease;
+  box-shadow: 0 5px 5px 2px rgba(211, 211, 211, 0.4);
+  border-radius: 5px;
 
   &:hover .product-card__media-link img {
     transform: scale(1.05);
-  }
-
-  &:hover .product-card__overlay {
-    opacity: 1;
-  }
-
-  &:hover .product-card__add {
-    transform: translateY(0);
   }
 }
 
 .product-card__media {
   position: relative;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1 / 1;
   border-radius: $radius-card;
   overflow: hidden;
   background: $color-surface-container;
@@ -807,13 +816,40 @@
 }
 
 .product-card__meta-link {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   text-decoration: none;
   color: inherit;
   transition: color $transition-fast;
+  width: 100%;
 
   &:hover .product-card__title {
     color: $color-primary;
+  }
+}
+
+.product-card__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.product-card__view-btn {
+  @include type-label-md;
+  background: #c58b73;
+  color: white;
+  padding: 0.6rem 0.9rem;
+  border-radius: $radius-sm;
+  white-space: nowrap;
+  // flex-shrink: 0;
+  width: 100%;
+  transition: background $transition-fast;
+
+  &:hover {
+    background: darken(#c58b73, 8%);
   }
 }
 
@@ -859,7 +895,9 @@
   gap: 0.5rem;
   font-family: $font-sans;
   transform: translateY(1rem);
-  transition: transform $transition-medium, background $transition-fast;
+  transition:
+    transform $transition-medium,
+    background $transition-fast;
 
   &--accent {
     background: $color-tertiary;
@@ -1361,7 +1399,9 @@
   font-size: 0.75rem;
   font-weight: 600;
   font-family: $font-sans;
-  transition: background $transition-fast, color $transition-fast;
+  transition:
+    background $transition-fast,
+    color $transition-fast;
 
   &:hover {
     background: $color-primary;

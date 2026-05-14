@@ -51,7 +51,7 @@ const Navbar: React.FC = () => {
           )}
         </div>
 
-        <div className="site-nav__search-wrap">
+        {/* <div className="site-nav__search-wrap">
           <span
             className="material-symbols-outlined site-nav__search-icon"
             aria-hidden
@@ -66,17 +66,16 @@ const Navbar: React.FC = () => {
             onChange={(e) => setSearch(e.target.value)}
             aria-label="Search flowers"
           />
-        </div>
+        </div> */}
 
         <div className="site-nav__actions">
-          <button
+          {/* <button
             type="button"
             className={`site-nav__icon-btn site-nav__icon-btn--search material-symbols-outlined press-effect sm-only-search`}
             aria-label="Search"
           >
             search
-          </button>
-
+          </button> */}
           <Link
             to="/cart"
             className="site-nav__cart press-effect"
@@ -87,7 +86,6 @@ const Navbar: React.FC = () => {
               <span className="site-nav__cart-badge">{getCartCount()}</span>
             )}
           </Link>
-
           <button
             type="button"
             className={`site-nav__wishlist material-symbols-outlined press-effect${wishlisted ? " site-nav__wishlist--active" : ""}`}
@@ -102,8 +100,7 @@ const Navbar: React.FC = () => {
           >
             {wishlisted ? "favorite" : "favorite_border"}
           </button>
-
-          {user ? (
+          {user && (
             <div className="site-nav__user">
               <span className="site-nav__username">{}</span>
               <button
@@ -114,15 +111,16 @@ const Navbar: React.FC = () => {
                 Logout
               </button>
             </div>
-          ) : (
-            <Link
-              to="/login"
-              className="site-nav__icon-btn material-symbols-outlined press-effect"
-              title="Admin Login"
-            >
-              person
-            </Link>
           )}
+          {/* // (
+          //   <Link
+          //     to="/login"
+          //     className="site-nav__icon-btn material-symbols-outlined press-effect"
+          //     title="Admin Login"
+          //   >
+          //     person
+          //   </Link>
+          // ) */}
           <button
             type="button"
             className="site-nav__icon-btn site-nav__icon-btn--menu material-symbols-outlined"

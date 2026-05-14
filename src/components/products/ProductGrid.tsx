@@ -200,41 +200,22 @@ const ProductGrid: React.FC = () => {
                   {product.badge && (
                     <span className="product-card__badge">{product.badge}</span>
                   )}
-                  <div className="product-card__overlay">
-                    <button
-                      type="button"
-                      className="product-card__add ambient-shadow press-effect"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const btn = e.currentTarget;
-                        const originalHTML = btn.innerHTML;
-                        btn.innerHTML = "<span>Added ✓</span>";
-                        btn.classList.add("product-card__add--accent");
-                        addToCart({
-                          ...product,
-                          price: tier1Price,
-                          image: tier1Image,
-                        });
-                        setTimeout(() => {
-                          btn.innerHTML = originalHTML;
-                          btn.classList.remove("product-card__add--accent");
-                        }, 1500);
-                      }}
-                    >
-                      <ShoppingBag size={18} /> Add to Cart
-                    </button>
-                  </div>
                 </div>
 
-                <button
-                  type="button"
-                  className="product-card__meta-link"
-                  onClick={() => handleProductClick(product)}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.5rem",
+                    alignContent: "center",
+                    alignItems: "center",
+                  }}
                 >
-                  <h4 className="product-card__title" title={product.name}>
-                    {product.name}
-                  </h4>
+                  <div className="product-card__info">
+                    <h4 className="product-card__title" title={product.name}>
+                      {product.name}
+                    </h4>
+                  </div>
                   <div className="product-card__price-row">
                     <div
                       style={{
@@ -243,17 +224,24 @@ const ProductGrid: React.FC = () => {
                         gap: "0.5rem",
                       }}
                     >
-                      <span className="product-card__price">
-                        {formatRs(tier1Price)}
-                      </span>
                       {product.oldPrice && (
                         <span className="product-card__old-price">
                           {formatRs(Number(product.oldPrice))}
                         </span>
                       )}
+                      <span className="product-card__price">
+                        {formatRs(tier1Price)}
+                      </span>
                     </div>
                   </div>
-                </button>
+                  <button
+                    type="button"
+                    className="product-card__meta-link"
+                    onClick={() => handleProductClick(product)}
+                  >
+                    <span className="product-card__view-btn">View Detail</span>
+                  </button>
+                </div>
               </div>
             );
           })}
