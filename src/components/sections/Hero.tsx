@@ -49,7 +49,7 @@ const Hero: React.FC = () => {
           <img
             alt="Handcrafted Pipe Cleaner Bouquet"
             className="hero__img"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP0mvFTbVi6Upy8OAYpCFacAG3zuu6ZcldgydnB7A-jkeZ5Z1uU_wMGbElPyhP4NvXX9zXTMcIeRSI-apSvSdzJ1TtBypQ7S4vJBBWnRLVopWhcZlWB4rvJDH7Q-Kr7P8kpRMFLlTj00K3dBfRVSQmBjblE_1h6qDFYd73ty6iQHayqfgt0MH2wPx9LiuHAS70TWSHUgVNE7TEDuOcqEhX1GQH7QZ-15GWhxzRdwx4L8YcCd9_4kk2QKdgv_eleYGTzN1JLu1z5Bk"
+            src="https://res.cloudinary.com/dkjqlvdxx/image/upload/v1778751222/WhatsApp_Image_2026-05-14_at_3.17.53_PM_dwpvhb.jpg"
           />
           <div className="hero__float-card">
             <p className="hero__float-title">Artisan Rose Blush</p>

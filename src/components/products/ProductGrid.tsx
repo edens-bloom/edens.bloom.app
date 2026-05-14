@@ -4,6 +4,7 @@ import { useStore } from "../../store/useStore";
 import { Loader2, ShoppingBag, X } from "lucide-react";
 import type { Product } from "../../models/types";
 import { formatRs } from "../../utils/formatRs";
+import Badge, { type BadgeType } from "./Badge";
 import "./ProductGrid.scss";
 
 const getTierPrice = (product: Product, tier: "tier1" | "tier2" | "tier3") => {
@@ -171,7 +172,6 @@ const ProductGrid: React.FC = () => {
       <section className="product-grid" id="occasions">
         <div className="product-grid__header">
           <div className="product-grid__intro">
-            <span className="product-grid__eyebrow">Bestsellers</span>
             <h2 className="product-grid__title">
               Most <em className="product-grid__title-accent">loved</em>{" "}
               bouquets
@@ -197,9 +197,7 @@ const ProductGrid: React.FC = () => {
                   >
                     <img src={tier1Image} alt={product.name} />
                   </button>
-                  {product.badge && (
-                    <span className="product-card__badge">{product.badge}</span>
-                  )}
+                  {product.badge && <Badge type={product.badge as BadgeType} />}
                 </div>
 
                 <div
