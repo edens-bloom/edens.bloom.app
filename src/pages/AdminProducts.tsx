@@ -37,7 +37,14 @@ interface AddonItem {
 }
 
 const AdminProducts: React.FC = () => {
-  const { products, fetchProducts, addProduct, updateProduct, deleteProduct, isLoading } = useStore();
+  const {
+    products,
+    fetchProducts,
+    addProduct,
+    updateProduct,
+    deleteProduct,
+    isLoading,
+  } = useStore();
 
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -47,6 +54,7 @@ const AdminProducts: React.FC = () => {
   const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
   const [packages, setPackages] = useState<PackageItem[]>(PRODUCT_PACKAGE);
   const [addons, setAddons] = useState<AddonItem[]>(INITIAL_ADDONS);
+  console.log("LOGG", addons);
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -131,7 +139,7 @@ const AdminProducts: React.FC = () => {
           isDefault: addon.is_default || false,
           file: null,
           preview: addon.image || null,
-        }))
+        })),
       );
     }
   };
@@ -300,7 +308,6 @@ const AdminProducts: React.FC = () => {
       .map((addon) => ({
         label: addon.label,
         price: addon.price,
-        is_default: addon.isDefault,
       }))
       .filter((addon) => addon.label);
     data.append("addons", JSON.stringify(addonsData));
@@ -313,7 +320,10 @@ const AdminProducts: React.FC = () => {
 
     let success: boolean;
     if (editingProduct) {
-      success = await updateProduct(editingProduct.id, data as unknown as Partial<Product>);
+      success = await updateProduct(
+        editingProduct.id,
+        data as unknown as Partial<Product>,
+      );
     } else {
       success = await addProduct(data as unknown as Product);
     }
@@ -373,7 +383,9 @@ const AdminProducts: React.FC = () => {
             marginBottom: "3rem",
           }}
         >
-          <h2 style={{ marginBottom: "1.5rem" }}>{editingProduct ? "Edit Bouquet" : "Create New Bouquet"}</h2>
+          <h2 style={{ marginBottom: "1.5rem" }}>
+            {editingProduct ? "Edit Bouquet" : "Create New Bouquet"}
+          </h2>
           <form
             onSubmit={handleSubmit}
             style={{
@@ -801,7 +813,7 @@ const AdminProducts: React.FC = () => {
                       key={addon.id}
                       style={{
                         display: "grid",
-                        gridTemplateColumns: "1.5fr 0.8fr 0.5fr 0.5fr 0.4fr",
+                        gridTemplateColumns: "1fr 0.8fr 0.3fr 0.2fr",
                         gap: "1rem",
                         alignItems: "center",
                         padding: "1rem",
@@ -838,28 +850,7 @@ const AdminProducts: React.FC = () => {
                           border: "1px solid #ddd",
                         }}
                       />
-                      <label
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.5rem",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={addon.isDefault}
-                          onChange={(e) =>
-                            handleAddonChange(
-                              idx,
-                              "isDefault",
-                              e.target.checked,
-                            )
-                          }
-                          style={{ cursor: "pointer" }}
-                        />
-                        <span style={{ fontSize: "0.8rem" }}>Default</span>
-                      </label>
+
                       <div
                         style={{
                           position: "relative",
@@ -964,7 +955,13 @@ const AdminProducts: React.FC = () => {
                 cursor: "pointer",
               }}
             >
-              {isLoading ? (editingProduct ? "Updating..." : "Creating...") : (editingProduct ? "Update Product" : "Create Product")}
+              {isLoading
+                ? editingProduct
+                  ? "Updating..."
+                  : "Creating..."
+                : editingProduct
+                  ? "Update Product"
+                  : "Create Product"}
             </button>
           </form>
         </div>
@@ -1008,8 +1005,12 @@ const AdminProducts: React.FC = () => {
                   cursor: "pointer",
                   transition: "background 0.2s",
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#f7fafc")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.background = "#f7fafc")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background = "transparent")
+                }
               >
                 <td
                   style={{
