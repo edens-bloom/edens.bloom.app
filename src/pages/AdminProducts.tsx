@@ -38,6 +38,7 @@ interface AddonItem {
   imageUrl?: string | null;
   sortOrder?: number;
   productId?: number;
+  isNew?: boolean;
 }
 
 const AdminProducts: React.FC = () => {
@@ -59,6 +60,8 @@ const AdminProducts: React.FC = () => {
   const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
   const [packages, setPackages] = useState<PackageItem[]>(PRODUCT_PACKAGE);
   const [addons, setAddons] = useState<AddonItem[]>(INITIAL_ADDONS);
+  console.log("addons", addons);
+  console.log("LOGGING ADDONS", addons);
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -283,6 +286,7 @@ const AdminProducts: React.FC = () => {
         isDefault: false,
         file: null,
         preview: null,
+        isNew: true,
       },
     ]);
   };
@@ -328,6 +332,7 @@ const AdminProducts: React.FC = () => {
         isDefault: addon.isDefault,
         sortOrder: addon.sortOrder,
         productId: addon.productId,
+        isNew: addon.isNew,
       }))
       .filter((addon) => addon.label);
     data.append("addons", JSON.stringify(addonsData));
@@ -902,9 +907,10 @@ const AdminProducts: React.FC = () => {
                             cursor: "pointer",
                           }}
                         />
-                        {addon.preview ? (
+
+                        {addon.imageUrl ? (
                           <img
-                            src={addon.preview}
+                            src={addon.imageUrl}
                             style={{
                               width: "100%",
                               height: "100%",
