@@ -158,7 +158,6 @@ export const useStore = create<BloomState>((set, get) => ({
       // Handle both { product: {...} } and direct product response
       const updatedProduct =
         response.data?.product || response.data || response;
-      console.log("LOGGING", id, updatedProduct);
       set((state) => ({
         products: state.products.map((p) =>
           p.id === id ? { ...p, ...updatedProduct } : p,
