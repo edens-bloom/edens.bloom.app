@@ -17,6 +17,7 @@ export interface ProductAddon {
   price?: number | string;
   is_default?: boolean;
   image?: string;
+  imageUrl: string;
 }
 
 export interface Product {
@@ -41,8 +42,9 @@ export interface Product {
   description: string;
   icon?: string;
   packages?: ProductPackages;
-  addons?: ProductAddon[];
+  addOns?: ProductAddon[];
   inStock?: boolean;
+  imageUrl: string;
 }
 
 export interface CartItem extends Product {
@@ -64,6 +66,8 @@ export interface BloomState {
   token: string | null;
   isLoading: boolean;
   error: string | null;
+  selectedProduct: Product | null;
+  setSelectedProduct: (product: Product | null) => void;
   fetchProducts: () => Promise<void>;
   fetchCart: () => Promise<void>;
   addToCart: (product: Product, quantity?: number) => Promise<void>;
@@ -76,6 +80,10 @@ export interface BloomState {
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   addProduct: (product: Product) => Promise<boolean>;
-  updateProduct: (id: number, productData: Partial<Product>) => Promise<boolean>;
+  updateProduct: (
+    id: number,
+    productData: Partial<Product>,
+  ) => Promise<boolean>;
   deleteProduct: (id: number) => Promise<boolean>;
+  fetchProductById: (id: number) => Promise<void>;
 }

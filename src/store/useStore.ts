@@ -4,6 +4,7 @@ import { productService, authService } from "../services";
 
 export const useStore = create<BloomState>((set, get) => ({
   products: [],
+  selectedProduct: null,
   cart: JSON.parse(localStorage.getItem("bloom_cart") || "[]"),
   wishlist: JSON.parse(localStorage.getItem("bloom_wishlist") || "[]"),
   user: JSON.parse(localStorage.getItem("bloom_user") || "null"),
@@ -11,6 +12,8 @@ export const useStore = create<BloomState>((set, get) => ({
   isLoading: false,
   error: null,
 
+  setSelectedProduct: (product: Product | null) =>
+    set({ selectedProduct: product }),
   fetchProducts: async () => {
     set({ isLoading: true, error: null });
     try {
@@ -28,6 +31,35 @@ export const useStore = create<BloomState>((set, get) => ({
 
   // No longer needed but kept for interface compatibility
   fetchCart: async () => {},
+
+  fetchProductById: async (id: number) => {
+    set({ isLoading: true, error: null });
+
+    try {
+      const response = await productService.fetchById(id);
+
+      const currentProducts = get().products;
+
+      // 🔥 Replace or add
+      const updatedProducts = currentProducts.some((p) => p.id === id)
+        ? currentProducts.map((p) => (p.id === id ? response : p))
+        : [...currentProducts, response];
+
+      set({
+        products: updatedProducts,
+        isLoading: false,
+        selectedProduct: response,
+      });
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to fetch product";
+
+      set({
+        error: errorMessage,
+        isLoading: false,
+      });
+    }
+  },
 
   addToCart: async (product: Product, quantity: number = 1) => {
     const qty = Math.max(1, Math.floor(Number(quantity) || 1));
@@ -51,6 +83,16 @@ export const useStore = create<BloomState>((set, get) => ({
   removeFromCart: async (productId: number) => {
     set((state) => {
       const newCart = state.cart.filter((item) => item.id !== productId);
+      saveCart(newCart);
+      return { cart: newCart };
+    });
+  },
+
+  updateCart: (cart: CartItem) => {
+    set((state) => {
+      const newCart = state.cart
+        .map((item) => (item.id === cart.id ? cart : item))
+        .filter((item) => item.quantity > 0);
       saveCart(newCart);
       return { cart: newCart };
     });

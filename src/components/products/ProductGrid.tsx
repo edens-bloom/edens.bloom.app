@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useStore } from "../../store/useStore";
 import { Loader2, ShoppingBag, X } from "lucide-react";
@@ -36,14 +36,23 @@ type BundleKey = "single" | "bundle5" | "bundle10";
 type PackKey = "none" | "plastic" | "paper";
 
 const ProductGrid: React.FC = () => {
-  const { products, fetchProducts, isLoading, error, addToCart } = useStore();
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const {
+    products,
+    fetchProducts,
+    isLoading,
+    error,
+    addToCart,
+    fetchProductById,
+    selectedProduct,
+    setSelectedProduct,
+    cart,
+  } = useStore();
   const [thumbIndex, setThumbIndex] = useState(0);
   const [bundle, setBundle] = useState<BundleKey>("single");
   const [packaging, setPackaging] = useState<PackKey>("none");
   const [quantity, setQuantity] = useState(1);
   const [addedFlash, setAddedFlash] = useState(false);
-
+  console.log("LOGGING", cart);
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
@@ -68,8 +77,8 @@ const ProductGrid: React.FC = () => {
 
   const mainImage = images[thumbIndex] ?? "";
 
-  const handleProductClick = (product: Product) => {
-    setSelectedProduct(product);
+  const handleProductClick = async (product: Product) => {
+    await fetchProductById(product.id);
     setThumbIndex(0);
     setBundle("single");
     setPackaging("none");
@@ -77,10 +86,10 @@ const ProductGrid: React.FC = () => {
     // body scroll lock now handled in useEffect
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setSelectedProduct(null);
     // body scroll lock now handled in useEffect
-  };
+  }, [setSelectedProduct]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -90,7 +99,7 @@ const ProductGrid: React.FC = () => {
       window.addEventListener("keydown", handleEscape);
       return () => window.removeEventListener("keydown", handleEscape);
     }
-  }, [selectedProduct]);
+  }, [selectedProduct, handleCloseModal]);
 
   if (isLoading) {
     return (
@@ -121,8 +130,6 @@ const ProductGrid: React.FC = () => {
   const tier3 = selectedProduct?.packages?.tier3;
   const bundle5Total = tier2?.price != null ? Number(tier2.price) : unit * 5;
   const bundle10Total = tier3?.price != null ? Number(tier3.price) : unit * 10;
-  const save5 = Math.max(0, unit * 6 - bundle5Total);
-  const save10 = Math.max(0, unit * 13 - bundle10Total);
 
   const packFee = selectedProduct
     ? packaging === "plastic"
@@ -131,15 +138,6 @@ const ProductGrid: React.FC = () => {
         ? Number(selectedProduct.paperBagPrice ?? 0)
         : Number(selectedProduct.noBagPrice ?? 0)
     : 0;
-
-  const bundleTitle5 =
-    typeof tier2?.label === "string" && tier2.label.trim()
-      ? String(tier2.label)
-      : "Buy 5 Get 1 Free";
-  const bundleTitle10 =
-    typeof tier3?.label === "string" && tier3.label.trim()
-      ? String(tier3.label)
-      : "Buy 10 Get 3 Free";
 
   const lineUnitPrice =
     bundle === "single"
@@ -262,34 +260,37 @@ const ProductGrid: React.FC = () => {
                 <div className="product-modal__grid">
                   <div className="product-modal__gallery">
                     <div className="product-modal__main-img-wrap ambient-shadow">
-                      {mainImage ? (
+                      {selectedProduct?.imageUrl ? (
                         <img
-                          src={mainImage}
+                          src={selectedProduct?.imageUrl}
                           alt={selectedProduct.name}
                           className="product-modal__main-img"
                         />
                       ) : null}
                     </div>
-                    {images.length > 1 && (
+                    {(selectedProduct?.addOns?.length || 0) > 1 && (
                       <div
                         className="product-modal__thumbs"
                         role="tablist"
                         aria-label="Product images"
                       >
-                        {images.map((src, i) => (
+                        {selectedProduct?.addOns?.map((addon, i) => (
                           <button
-                            key={`${src}-${i}`}
+                            key={addon.id}
                             type="button"
                             className={`product-modal__thumb${i === thumbIndex ? " product-modal__thumb--active" : ""}`}
                             onClick={() => setThumbIndex(i)}
                             aria-label={`View image ${i + 1}`}
                             aria-selected={i === thumbIndex}
                           >
-                            <img src={src} alt="" />
+                            <img src={addon.imageUrl} alt="" />
                           </button>
                         ))}
                       </div>
                     )}
+                    <p className="product-modal__desc">
+                      {selectedProduct.description}
+                    </p>
                   </div>
                   <div className="product-modal__info">
                     <div className="product-modal__meta-row">
@@ -322,10 +323,8 @@ const ProductGrid: React.FC = () => {
                     <p className="product-modal__price">
                       {formatRs(lineUnitPrice)}
                     </p>
-                    <p className="product-modal__desc">
-                      {selectedProduct.description}
-                    </p>
-                    <div>
+
+                    {/* <div>
                       <p className="product-modal__section-label">
                         Bundle &amp; save
                       </p>
@@ -386,54 +385,26 @@ const ProductGrid: React.FC = () => {
                           </div>
                         </button>
                       </div>
-                    </div>
+                    </div> */}
                     <div>
                       <p className="product-modal__section-label">
                         Packaging selection
                       </p>
                       <div className="product-modal__packaging">
-                        <button
-                          type="button"
-                          className={`product-modal__pack${packaging === "none" ? " product-modal__pack--active" : ""}`}
-                          onClick={() => setPackaging("none")}
-                        >
-                          <div className="product-modal__pack-label">
-                            No bag
-                          </div>
-                          <div className="product-modal__pack-price">
-                            {formatRs(Number(selectedProduct.noBagPrice ?? 0))}
-                          </div>
-                        </button>
-                        <button
-                          type="button"
-                          className={`product-modal__pack${packaging === "plastic" ? " product-modal__pack--active" : ""}`}
-                          onClick={() => setPackaging("plastic")}
-                        >
-                          <div className="product-modal__pack-label">
-                            Plastic bag
-                          </div>
-                          <div className="product-modal__pack-price">
-                            +
-                            {formatRs(
-                              Number(selectedProduct.plasticBagPrice ?? 0),
-                            )}
-                          </div>
-                        </button>
-                        <button
-                          type="button"
-                          className={`product-modal__pack${packaging === "paper" ? " product-modal__pack--active" : ""}`}
-                          onClick={() => setPackaging("paper")}
-                        >
-                          <div className="product-modal__pack-label">
-                            Paper bag
-                          </div>
-                          <div className="product-modal__pack-price">
-                            +
-                            {formatRs(
-                              Number(selectedProduct.paperBagPrice ?? 0),
-                            )}
-                          </div>
-                        </button>
+                        {selectedProduct?.addOns?.map((addon) => (
+                          <button
+                            type="button"
+                            className={`product-modal__pack${packaging === "none" ? " product-modal__pack--active" : ""}`}
+                            onClick={() => setPackaging("none")}
+                          >
+                            <div className="product-modal__pack-label">
+                              {addon.label}
+                            </div>
+                            <div className="product-modal__pack-price">
+                              {formatRs(Number(addon.price ?? 0))}
+                            </div>
+                          </button>
+                        ))}
                       </div>
                     </div>
                     <div className="product-modal__qty-row">
