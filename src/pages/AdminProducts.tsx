@@ -28,8 +28,8 @@ interface PackageItem {
   preview: string | null;
 }
 
-interface AddonItem {
-  id: string;
+export interface AddonItem {
+  id?: string;
   label: string;
   price: string;
   isDefault: boolean;
@@ -38,7 +38,8 @@ interface AddonItem {
   imageUrl?: string | null;
   sortOrder?: number;
   productId?: number;
-  isNew?: boolean;
+  tempId?: number;
+  isDirty?: boolean;
 }
 
 const AdminProducts: React.FC = () => {
@@ -51,7 +52,6 @@ const AdminProducts: React.FC = () => {
     isLoading,
   } = useStore();
 
-  const [isFetching, setIsFetching] = useState<boolean>(false);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showPackagesDropdown, setShowPackagesDropdown] = useState(false);
@@ -60,8 +60,6 @@ const AdminProducts: React.FC = () => {
   const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
   const [packages, setPackages] = useState<PackageItem[]>(PRODUCT_PACKAGE);
   const [addons, setAddons] = useState<AddonItem[]>(INITIAL_ADDONS);
-  console.log("addons", addons);
-  console.log("LOGGING ADDONS", addons);
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -91,74 +89,24 @@ const AdminProducts: React.FC = () => {
   };
 
   const handleEditClick = async (product: Product) => {
-    setIsFetching(true);
-
     try {
-      const prouctDetails = await productService.fetchById(product.id);
-      setIsFetching(false);
+      const productDetails = await productService.fetchById(product.id);
       setEditingProduct(product);
       setShowForm(true);
       setFormData({
-        name: prouctDetails.name || "",
-        price: prouctDetails.price?.toString() || "",
-        oldPrice: prouctDetails.oldPrice?.toString() || "",
-        category: prouctDetails.category || "Roses",
-        badge: prouctDetails.badge || "",
-        rating: prouctDetails.rating?.toString() || "5",
-        description: prouctDetails.description || "",
-        inStock: prouctDetails.inStock?.toString() || "true",
+        name: productDetails.name || "",
+        price: productDetails.price?.toString() || "",
+        oldPrice: productDetails.oldPrice?.toString() || "",
+        category: productDetails.category || "Roses",
+        badge: productDetails.badge || "",
+        rating: productDetails.rating?.toString() || "5",
+        description: productDetails.description || "",
+        inStock: productDetails.inStock?.toString() || "true",
       });
-      setMainImagePreview(prouctDetails.image || null);
-      setAddons(prouctDetails.addOns);
+      setMainImagePreview(productDetails.imageUrl || null);
+      setAddons(productDetails.addOns);
     } catch (error) {
       console.log(error);
-    } finally {
-      setIsFetching(false);
-    }
-
-    // Load packages from tier1, tier2, tier3
-    const pkgList: PackageItem[] = [];
-    if (product.packages?.tier1) {
-      pkgList.push({
-        id: "tier1",
-        label: product.packages.tier1.label || "",
-        price: product.packages.tier1.price?.toString() || "",
-        file: null,
-        preview: product.packages.tier1.image || null,
-      });
-    }
-    if (product.packages?.tier2) {
-      pkgList.push({
-        id: "tier2",
-        label: product.packages.tier2.label || "",
-        price: product.packages.tier2.price?.toString() || "",
-        file: null,
-        preview: product.packages.tier2.image || null,
-      });
-    }
-    if (product.packages?.tier3) {
-      pkgList.push({
-        id: "tier3",
-        label: product.packages.tier3.label || "",
-        price: product.packages.tier3.price?.toString() || "",
-        file: null,
-        preview: product.packages.tier3.image || null,
-      });
-    }
-    setPackages(pkgList.length > 0 ? pkgList : PRODUCT_PACKAGE);
-
-    // Load addons if available
-    if (product.addons && product.addons.length > 0) {
-      setAddons(
-        product.addons.map((addon) => ({
-          id: addon.id?.toString() || Date.now().toString(),
-          label: addon.label || "",
-          price: addon.price?.toString() || "",
-          isDefault: addon.is_default || false,
-          file: null,
-          preview: addon.image || null,
-        })),
-      );
     }
   };
 
@@ -249,9 +197,10 @@ const AdminProducts: React.FC = () => {
         // Only one can be default
         updated.forEach((addon, idx) => {
           addon.isDefault = idx === index;
+          addon.isDirty = true;
         });
       } else {
-        updated[index] = { ...updated[index], [field]: value };
+        updated[index] = { ...updated[index], [field]: value, isDirty: true };
       }
       return updated;
     });
@@ -267,7 +216,8 @@ const AdminProducts: React.FC = () => {
           updated[index] = {
             ...updated[index],
             file: compressedFile,
-            preview: reader.result as string,
+            imageUrl: reader.result as string,
+            isDirty: true,
           };
           return updated;
         });
@@ -280,13 +230,13 @@ const AdminProducts: React.FC = () => {
     setAddons((prev) => [
       ...prev,
       {
-        id: Date.now().toString(),
+        tempId: prev?.length + 1,
         label: "",
         price: "",
         isDefault: false,
         file: null,
         preview: null,
-        isNew: true,
+        isDirty: true,
       },
     ]);
   };
@@ -324,6 +274,7 @@ const AdminProducts: React.FC = () => {
 
     // Add addons
     const addonsData = addons
+      .filter((addon) => addon.label && addon.isDirty)
       .map((addon) => ({
         label: addon.label,
         price: addon.price,
@@ -332,17 +283,16 @@ const AdminProducts: React.FC = () => {
         isDefault: addon.isDefault,
         sortOrder: addon.sortOrder,
         productId: addon.productId,
-        isNew: addon.isNew,
-      }))
-      .filter((addon) => addon.label);
+        tempId: addon.tempId,
+      }));
     data.append("addons", JSON.stringify(addonsData));
     // Add addon images
-    addons.forEach((addon, idx) => {
+    addons.forEach((addon) => {
       if (addon.file) {
         if (addon.id) {
           data.append(`addonImage_${addon.id}`, addon.file);
         } else {
-          data.append(`addonImage_new_${idx}`, addon.file);
+          data.append(`addonImage_new_${addon.tempId}`, addon.file);
         }
       }
     });
@@ -909,6 +859,15 @@ const AdminProducts: React.FC = () => {
                         />
 
                         {addon.imageUrl ? (
+                          <img
+                            src={addon.imageUrl}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                          />
+                        ) : addon.imageUrl ? (
                           <img
                             src={addon.imageUrl}
                             style={{
