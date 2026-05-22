@@ -45,14 +45,12 @@ const ProductGrid: React.FC = () => {
     fetchProductById,
     selectedProduct,
     setSelectedProduct,
-    cart,
   } = useStore();
   const [thumbIndex, setThumbIndex] = useState(0);
   const [bundle, setBundle] = useState<BundleKey>("single");
   const [packaging, setPackaging] = useState<PackKey>("none");
   const [quantity, setQuantity] = useState(1);
   const [addedFlash, setAddedFlash] = useState(false);
-  console.log("LOGGING", cart);
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
