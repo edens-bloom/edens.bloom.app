@@ -5,3 +5,4 @@
 
 export { productService } from "./productService";
 export { authService } from "./authService";
+export { designRequestService } from "./designRequestService";
