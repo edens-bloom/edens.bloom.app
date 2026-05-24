@@ -1,39 +1,29 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useStore } from "../../store/useStore";
 import { Loader2, ShoppingBag, X } from "lucide-react";
-import type { Product } from "../../models/types";
+import type { Product, SelectedProduct } from "../../models/types";
 import { formatRs } from "../../utils/formatRs";
 import Badge, { type BadgeType } from "./Badge";
 import "./ProductGrid.scss";
+import calculatePrice from "../../utils/calculatePrice";
 
-const getTierPrice = (product: Product, tier: "tier1" | "tier2" | "tier3") => {
-  const tierData = product.packages?.[tier];
-  const tierPrice = tierData?.price;
-  return Number(tierPrice ?? product.price);
+const getSelectedImage = (product: SelectedProduct) => {
+  if (!product?.id) return product?.imageUrl;
+  return (
+    <img
+      src={product?.selectedImageUrl || product.imageUrl}
+      alt={product.name}
+      className="product-modal__main-img"
+    />
+  );
 };
 
-const getTierImage = (product: Product, tier: "tier1" | "tier2" | "tier3") => {
-  const tierData = product.packages?.[tier];
-  const tierImage = tierData?.image;
-  return typeof tierImage === "string" ? tierImage : product.image;
+const getCurrentPrice = (product: SelectedProduct): number => {
+  return product.selectedAddOnId
+    ? Number(product.selectedAddOnPrice)
+    : Number(product.price || 0);
 };
-
-function galleryImages(p: Product): string[] {
-  const urls = [
-    getTierImage(p, "tier1"),
-    getTierImage(p, "tier2"),
-    getTierImage(p, "tier3"),
-    p.image,
-    p.plasticBagImage,
-    p.paperBagImage,
-    p.noBagImage,
-  ].filter((u): u is string => typeof u === "string" && u.length > 0);
-  return [...new Set(urls)];
-}
-
-type BundleKey = "single" | "bundle5" | "bundle10";
-type PackKey = "none" | "plastic" | "paper";
 
 const ProductGrid: React.FC = () => {
   const {
@@ -41,15 +31,12 @@ const ProductGrid: React.FC = () => {
     fetchProducts,
     isLoading,
     error,
-    addToCart,
+    // addToCart,
     fetchProductById,
     selectedProduct,
     setSelectedProduct,
+    updateSelectedProduct: updateSelected,
   } = useStore();
-  const [thumbIndex, setThumbIndex] = useState(0);
-  const [bundle, setBundle] = useState<BundleKey>("single");
-  const [packaging, setPackaging] = useState<PackKey>("none");
-  const [quantity, setQuantity] = useState(1);
   const [addedFlash, setAddedFlash] = useState(false);
   useEffect(() => {
     fetchProducts();
@@ -57,7 +44,7 @@ const ProductGrid: React.FC = () => {
 
   // Ensure body scroll lock is always reset
   useEffect(() => {
-    if (selectedProduct) {
+    if (selectedProduct?.id) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
@@ -66,26 +53,15 @@ const ProductGrid: React.FC = () => {
     return () => {
       document.body.style.overflow = "";
     };
-  }, [selectedProduct]);
-
-  const images = useMemo(
-    () => (selectedProduct ? galleryImages(selectedProduct) : []),
-    [selectedProduct],
-  );
-
-  const mainImage = images[thumbIndex] ?? "";
+  }, [selectedProduct?.id]);
 
   const handleProductClick = async (product: Product) => {
-    await fetchProductById(product.id);
-    setThumbIndex(0);
-    setBundle("single");
-    setPackaging("none");
-    setQuantity(1);
+    await fetchProductById(product.id, true);
     // body scroll lock now handled in useEffect
   };
 
   const handleCloseModal = useCallback(() => {
-    setSelectedProduct(null);
+    setSelectedProduct({} as SelectedProduct);
     // body scroll lock now handled in useEffect
   }, [setSelectedProduct]);
 
@@ -123,38 +99,9 @@ const ProductGrid: React.FC = () => {
     );
   }
 
-  const unit = selectedProduct ? getTierPrice(selectedProduct, "tier1") : 0;
-  const tier2 = selectedProduct?.packages?.tier2;
-  const tier3 = selectedProduct?.packages?.tier3;
-  const bundle5Total = tier2?.price != null ? Number(tier2.price) : unit * 5;
-  const bundle10Total = tier3?.price != null ? Number(tier3.price) : unit * 10;
-
-  const packFee = selectedProduct
-    ? packaging === "plastic"
-      ? Number(selectedProduct.plasticBagPrice ?? 0)
-      : packaging === "paper"
-        ? Number(selectedProduct.paperBagPrice ?? 0)
-        : Number(selectedProduct.noBagPrice ?? 0)
-    : 0;
-
-  const lineUnitPrice =
-    bundle === "single"
-      ? unit + packFee
-      : bundle === "bundle5"
-        ? bundle5Total + packFee
-        : bundle10Total + packFee;
-
   const handleAddToCart = () => {
     if (!selectedProduct) return;
-    const img = mainImage || selectedProduct.image;
-    addToCart(
-      {
-        ...selectedProduct,
-        price: lineUnitPrice,
-        image: img,
-      },
-      quantity,
-    );
+
     setAddedFlash(true);
     setTimeout(() => setAddedFlash(false), 1600);
   };
@@ -179,9 +126,6 @@ const ProductGrid: React.FC = () => {
         </div>
         <div className="product-grid__cards">
           {products.map((product) => {
-            const tier1Price = getTierPrice(product, "tier1");
-            const tier1Image = getTierImage(product, "tier1");
-
             return (
               <div key={product.id} className="product-card fade-up visible">
                 <div className="product-card__media ambient-shadow felt-texture">
@@ -191,7 +135,7 @@ const ProductGrid: React.FC = () => {
                     aria-label={`View ${product.name}`}
                     onClick={() => handleProductClick(product)}
                   >
-                    <img src={tier1Image} alt={product.name} />
+                    <img src={product.imageUrl} alt={product.name} />
                   </button>
                   {product.badge && <Badge type={product.badge as BadgeType} />}
                 </div>
@@ -224,7 +168,7 @@ const ProductGrid: React.FC = () => {
                         </span>
                       )}
                       <span className="product-card__price">
-                        {formatRs(tier1Price)}
+                        {formatRs(product.price)}
                       </span>
                     </div>
                   </div>
@@ -242,7 +186,7 @@ const ProductGrid: React.FC = () => {
         </div>
       </section>
 
-      {selectedProduct &&
+      {selectedProduct?.id &&
         createPortal(
           <div className="product-modal-overlay" onClick={handleCloseModal}>
             <div className="product-modal" onClick={(e) => e.stopPropagation()}>
@@ -258,13 +202,7 @@ const ProductGrid: React.FC = () => {
                 <div className="product-modal__grid">
                   <div className="product-modal__gallery">
                     <div className="product-modal__main-img-wrap ambient-shadow">
-                      {selectedProduct?.imageUrl ? (
-                        <img
-                          src={selectedProduct?.imageUrl}
-                          alt={selectedProduct.name}
-                          className="product-modal__main-img"
-                        />
-                      ) : null}
+                      {getSelectedImage(selectedProduct)}
                     </div>
                     {(selectedProduct?.addOns?.length || 0) > 1 && (
                       <div
@@ -272,14 +210,40 @@ const ProductGrid: React.FC = () => {
                         role="tablist"
                         aria-label="Product images"
                       >
+                        <button
+                          key={`${selectedProduct.id}-main`}
+                          type="button"
+                          className={`product-modal__thumb${!selectedProduct.selectedAddOnId ? " product-modal__thumb--active" : ""}`}
+                          onClick={() =>
+                            updateSelected(
+                              calculatePrice({
+                                ...selectedProduct,
+                                selectedAddOnId: null,
+                                selectedAddOnPrice: 0,
+                                selectedImageUrl: selectedProduct.imageUrl,
+                              }),
+                            )
+                          }
+                          aria-label={`View image ${1}`}
+                        >
+                          <img src={selectedProduct.imageUrl} alt="" />
+                        </button>
                         {selectedProduct?.addOns?.map((addon, i) => (
                           <button
                             key={addon.id}
                             type="button"
-                            className={`product-modal__thumb${i === thumbIndex ? " product-modal__thumb--active" : ""}`}
-                            onClick={() => setThumbIndex(i)}
+                            className={`product-modal__thumb${selectedProduct.selectedAddOnId === addon.id ? " product-modal__thumb--active" : ""}`}
+                            onClick={() =>
+                              updateSelected(
+                                calculatePrice({
+                                  ...selectedProduct,
+                                  selectedAddOnId: addon.id ?? 0,
+                                  selectedAddOnPrice: Number(addon.price ?? 0),
+                                  selectedImageUrl: addon.imageUrl,
+                                }),
+                              )
+                            }
                             aria-label={`View image ${i + 1}`}
-                            aria-selected={i === thumbIndex}
                           >
                             <img src={addon.imageUrl} alt="" />
                           </button>
@@ -319,7 +283,22 @@ const ProductGrid: React.FC = () => {
                       {selectedProduct.name}
                     </h1>
                     <p className="product-modal__price">
-                      {formatRs(lineUnitPrice)}
+                      {formatRs(
+                        selectedProduct.subTotal ?? selectedProduct.price,
+                      )}
+                      {selectedProduct.quantity > 1 && (
+                        <span
+                          style={{
+                            fontSize: "0.8rem",
+                            fontWeight: "normal",
+                            marginLeft: "8px",
+                            opacity: 0.8,
+                          }}
+                        >
+                          ({selectedProduct.quantity} &times;{" "}
+                          {formatRs(getCurrentPrice(selectedProduct))})
+                        </span>
+                      )}
                     </p>
 
                     {/* <div>
@@ -389,11 +368,42 @@ const ProductGrid: React.FC = () => {
                         Packaging selection
                       </p>
                       <div className="product-modal__packaging">
+                        <button
+                          type="button"
+                          className={`product-modal__pack${!selectedProduct?.selectedAddOnId ? " product-modal__pack--active" : ""}`}
+                          onClick={() =>
+                            updateSelected(
+                              calculatePrice({
+                                ...selectedProduct,
+                                selectedAddOnId: null,
+                                selectedAddOnPrice: 0,
+                                selectedImageUrl: selectedProduct.imageUrl,
+                              }),
+                            )
+                          }
+                        >
+                          <div className="product-modal__pack-label">
+                            No bag
+                          </div>
+                          <div className="product-modal__pack-price">
+                            {formatRs(Number(selectedProduct.price ?? 0))}
+                          </div>
+                        </button>
                         {selectedProduct?.addOns?.map((addon) => (
                           <button
+                            key={addon.id}
                             type="button"
-                            className={`product-modal__pack${packaging === "none" ? " product-modal__pack--active" : ""}`}
-                            onClick={() => setPackaging("none")}
+                            className={`product-modal__pack${selectedProduct?.selectedAddOnId === addon.id ? " product-modal__pack--active" : ""}`}
+                            onClick={() =>
+                              updateSelected(
+                                calculatePrice({
+                                  ...selectedProduct,
+                                  selectedAddOnId: addon.id ?? 0,
+                                  selectedAddOnPrice: Number(addon.price ?? 0),
+                                  selectedImageUrl: addon.imageUrl,
+                                }),
+                              )
+                            }
                           >
                             <div className="product-modal__pack-label">
                               {addon.label}
@@ -410,18 +420,38 @@ const ProductGrid: React.FC = () => {
                         <button
                           type="button"
                           className="product-modal__qty-btn"
-                          onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                          onClick={() => {
+                            updateSelected(
+                              calculatePrice({
+                                ...selectedProduct,
+                                quantity: Math.max(
+                                  1,
+                                  selectedProduct.quantity - 1,
+                                ),
+                              }),
+                            );
+                          }}
                           aria-label="Decrease quantity"
                         >
                           −
                         </button>
                         <span className="product-modal__qty-val">
-                          {quantity}
+                          {selectedProduct.quantity}
                         </span>
                         <button
                           type="button"
                           className="product-modal__qty-btn"
-                          onClick={() => setQuantity((q) => q + 1)}
+                          onClick={() => {
+                            updateSelected(
+                              calculatePrice({
+                                ...selectedProduct,
+                                quantity: Math.min(
+                                  10,
+                                  selectedProduct.quantity + 1,
+                                ),
+                              }),
+                            );
+                          }}
                           aria-label="Increase quantity"
                         >
                           +

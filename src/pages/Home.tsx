@@ -3,7 +3,6 @@ import {
   CategorySection,
   FeatureStrip,
   Hero,
-  Newsletter,
   ProductGrid,
   WhyPipeCleaners,
 } from "../components";
@@ -16,7 +15,6 @@ const Home: React.FC = () => {
       <CategorySection />
       <ProductGrid />
       <WhyPipeCleaners />
-      <Newsletter />
     </div>
   );
 };

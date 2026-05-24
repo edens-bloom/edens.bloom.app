@@ -1,11 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useStore } from "../../store/useStore";
 
 const Navbar: React.FC = () => {
   const location = useLocation();
   const { getCartCount, user, logout, wishlist, toggleWishlist } = useStore();
-  const [search, setSearch] = useState("");
 
   const shopActive =
     location.pathname === "/" || /^\/item\/\d+/.test(location.pathname);
@@ -29,18 +28,16 @@ const Navbar: React.FC = () => {
           Edens Bloom
         </Link>
         <div className="site-nav__links">
-          <Link
-            to="/"
+          <a
+            href="#occasions"
             className={`site-nav__link${shopActive ? " site-nav__link--active" : ""}`}
           >
             Shop
-          </Link>
-          <Link to="/#tutorials" className="site-nav__link">
-            Tutorials
-          </Link>
-          <Link to="/#bespoke-creations" className="site-nav__link">
+          </a>
+
+          <a href="#custom-design" className="site-nav__link">
             Custom
-          </Link>
+          </a>
           {user?.role === "admin" && (
             <Link
               to="/product"
