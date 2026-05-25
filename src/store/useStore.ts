@@ -141,15 +141,15 @@ export const useStore = create<BloomState>((set, get) => {
       });
     },
 
-    updateCart: (cart: CartItem) => {
+    updateCart: (cart: SelectedProduct) => {
       setDraft((state) => {
         const index = state.cart.findIndex(
           (item: CartItem) => item.id === cart.id,
         );
         if (index !== -1) {
-          state.cart[index] = cart;
+          state.cart[index] = calculatePrice(cart);
         }
-        state.cart = state.cart.filter((item: CartItem) => item.quantity > 0);
+        // state.cart = state.cart.filter((item: CartItem) => item.quantity > 0);
         saveCart(state.cart);
       });
     },

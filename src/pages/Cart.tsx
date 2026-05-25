@@ -8,7 +8,7 @@ import { OrderConfirmation } from "../components";
 import type { SelectedProduct } from "../models/types";
 
 const Cart: React.FC = () => {
-  const { cart, removeFromCart, updateQuantity, clearCart } = useStore();
+  const { cart, removeFromCart, clearCart, updateCart } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleCheckout = () => setIsModalOpen(true);
@@ -121,10 +121,13 @@ const Cart: React.FC = () => {
                       </div>
 
                       <div className="item-footer">
-                        {/* <div className="item-quantity">
+                        <div className="item-quantity">
                           <button
                             onClick={() =>
-                              updateQuantity(item.id, item.quantity - 1)
+                              updateCart({
+                                ...item,
+                                quantity: Math.max(1, item.quantity - 1),
+                              })
                             }
                             aria-label="Decrease quantity"
                           >
@@ -133,13 +136,16 @@ const Cart: React.FC = () => {
                           <span>{item.quantity}</span>
                           <button
                             onClick={() =>
-                              updateQuantity(item.id, item.quantity + 1)
+                              updateCart({
+                                ...item,
+                                quantity: Math.min(10, item.quantity + 1),
+                              })
                             }
                             aria-label="Increase quantity"
                           >
                             <Plus size={16} />
                           </button>
-                        </div> */}
+                        </div>
 
                         <div className="item-price">
                           <p>
@@ -164,28 +170,42 @@ const Cart: React.FC = () => {
             <aside className="cart-summary">
               <div className="summary-card">
                 <h2>Order Summary</h2>
-                <div className="summary-row">
+                {/* <div className="summary-row">
                   <span>Subtotal</span>
-                  <span>{formatRs(200)}</span>
-                </div>
-                <div className="summary-row">
+                  <span>
+                    {formatRs(
+                      cart.reduce(
+                        (total, item) => total + (item.subTotal ?? 0),
+                        0,
+                      ),
+                    )}
+                  </span>
+                </div> */}
+                {/* <div className="summary-row">
                   <span>Shipping</span>
                   <span>{cart.length === 0 ? "FREE" : formatRs(200)}</span>
-                </div>
+                </div> */}
                 <div className="summary-row total">
                   <span>Total</span>
-                  <span>{formatRs(300)}</span>
+                  <span>
+                    {formatRs(
+                      cart.reduce(
+                        (total, item) => total + (item.subTotal ?? 0),
+                        0,
+                      ),
+                    )}
+                  </span>
                 </div>
 
                 <button className="checkout-btn" onClick={handleCheckout}>
                   Proceed to Checkout <ArrowRight size={18} />
                 </button>
 
-                <p className="shipping-note">
+                {/* <p className="shipping-note">
                   {cart.length === 0
                     ? "Shipping will be calculated at checkout."
                     : `Shipping calculated at checkout. Free shipping over ${formatRs(15000)}.`}
-                </p>
+                </p> */}
 
                 <div className="sustainability-note">
                   <span className="material-symbols-outlined">eco</span>

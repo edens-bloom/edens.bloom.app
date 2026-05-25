@@ -14,7 +14,7 @@ import {
   Pencil,
 } from "lucide-react";
 import { formatRs } from "../utils/formatRs";
-import type { Product } from "../models/types";
+import type { Product, SelectedProduct } from "../models/types";
 import compressImage from "../utils/compress";
 import INITIAL_ADDONS from "../constants/add-ons";
 import PRODUCT_PACKAGE from "../constants/product-package";
@@ -304,7 +304,7 @@ const AdminProducts: React.FC = () => {
         data as unknown as Partial<Product>,
       );
     } else {
-      success = await addProduct(data as unknown as Product);
+      success = await addProduct(data as unknown as SelectedProduct);
     }
 
     if (success) {
