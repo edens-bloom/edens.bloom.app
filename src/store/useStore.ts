@@ -58,40 +58,58 @@ export const useStore = create<BloomState>((set, get) => {
     fetchCart: async () => {},
 
     fetchProductById: async (id: number, isSelected?: boolean) => {
+      const existing = get().products.find(
+        (p: Product) => p.id === id,
+      ) as Product;
+      if (existing && isSelected && Object.hasOwn(existing, "addOns")) {
+        setDraft((state) => {
+          if (isSelected) {
+            state.selectedProduct = calculatePrice({
+              ...existing,
+              quantity: 1,
+              selectedAddOnId: null,
+              selectedAddOnPrice: 0,
+              selectedImageUrl: existing.imageUrl,
+            });
+          }
+        });
+        return;
+      }
       setDraft((state) => {
         state.isLoading = true;
         state.error = null;
       });
+      if (!Object.hasOwn(existing, "addOns")) {
+        try {
+          const response = await productService.fetchById(id);
 
-      try {
-        const response = await productService.fetchById(id);
-
-        setDraft((state) => {
-          const index = state.products.findIndex((p: Product) => p.id === id);
-          if (index !== -1) {
-            if (!state.products[index].addOns && response.addOns) {
-              state.products[index].addOns = response.addOns || [];
+          setDraft((state) => {
+            const index = state.products.findIndex((p: Product) => p.id === id);
+            if (index !== -1) {
+              if (!state.products[index].addOns && response.addOns) {
+                state.products[index].addOns = response.addOns || [];
+              }
             }
-          }
-          state.isLoading = false;
-          if (isSelected) {
-            state.selectedProduct = calculatePrice({
-              ...response,
-              quantity: 1,
-              selectedAddOnId: null,
-              selectedAddOnPrice: 0,
-              selectedImageUrl: response.imageUrl,
-            });
-          }
-        });
-      } catch (err: unknown) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to fetch product";
+            state.isLoading = false;
+            if (isSelected) {
+              state.selectedProduct = calculatePrice({
+                ...response,
+                quantity: 1,
+                selectedAddOnId: null,
+                selectedAddOnPrice: 0,
+                selectedImageUrl: response.imageUrl,
+              });
+            }
+          });
+        } catch (err: unknown) {
+          const errorMessage =
+            err instanceof Error ? err.message : "Failed to fetch product";
 
-        setDraft((state) => {
-          state.error = errorMessage;
-          state.isLoading = false;
-        });
+          setDraft((state) => {
+            state.error = errorMessage;
+            state.isLoading = false;
+          });
+        }
       }
     },
 

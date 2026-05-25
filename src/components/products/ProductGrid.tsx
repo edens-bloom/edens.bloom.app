@@ -364,31 +364,35 @@ const ProductGrid: React.FC = () => {
                       </div>
                     </div> */}
                     <div>
-                      <p className="product-modal__section-label">
-                        Packaging selection
-                      </p>
                       <div className="product-modal__packaging">
-                        <button
-                          type="button"
-                          className={`product-modal__pack${!selectedProduct?.selectedAddOnId ? " product-modal__pack--active" : ""}`}
-                          onClick={() =>
-                            updateSelected(
-                              calculatePrice({
-                                ...selectedProduct,
-                                selectedAddOnId: null,
-                                selectedAddOnPrice: 0,
-                                selectedImageUrl: selectedProduct.imageUrl,
-                              }),
-                            )
-                          }
-                        >
-                          <div className="product-modal__pack-label">
-                            No bag
-                          </div>
-                          <div className="product-modal__pack-price">
-                            {formatRs(Number(selectedProduct.price ?? 0))}
-                          </div>
-                        </button>
+                        {(selectedProduct?.addOns?.length || 0) > 0 && (
+                          <>
+                            <p className="product-modal__section-label">
+                              Packaging selection
+                            </p>
+                            <button
+                              type="button"
+                              className={`product-modal__pack${!selectedProduct?.selectedAddOnId ? " product-modal__pack--active" : ""}`}
+                              onClick={() =>
+                                updateSelected(
+                                  calculatePrice({
+                                    ...selectedProduct,
+                                    selectedAddOnId: null,
+                                    selectedAddOnPrice: 0,
+                                    selectedImageUrl: selectedProduct.imageUrl,
+                                  }),
+                                )
+                              }
+                            >
+                              <div className="product-modal__pack-label">
+                                No bag
+                              </div>
+                              <div className="product-modal__pack-price">
+                                {formatRs(Number(selectedProduct.price ?? 0))}
+                              </div>
+                            </button>
+                          </>
+                        )}
                         {selectedProduct?.addOns?.map((addon) => (
                           <button
                             key={addon.id}
