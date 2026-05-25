@@ -14,7 +14,7 @@ export interface ProductPackages {
 export interface ProductAddon {
   id?: number;
   label?: string;
-  price?: number | string;
+  price?: number;
   is_default?: boolean;
   image?: string;
   imageUrl: string;
@@ -68,7 +68,7 @@ export interface User {
 
 export interface BloomState {
   products: Product[];
-  cart: CartItem[];
+  cart: SelectedProduct[];
   wishlist: number[];
   user: User | null;
   token: string | null;
@@ -78,7 +78,7 @@ export interface BloomState {
   setSelectedProduct: (product: SelectedProduct) => void;
   fetchProducts: () => Promise<void>;
   fetchCart: () => Promise<void>;
-  addToCart: (product: Product, quantity?: number) => Promise<void>;
+  addToCart: (product: SelectedProduct) => Promise<void>;
   removeFromCart: (productId: number) => Promise<void>;
   updateQuantity: (productId: number, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -87,7 +87,7 @@ export interface BloomState {
   getCartCount: () => number;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
-  addProduct: (product: Product) => Promise<boolean>;
+  addProduct: (product: SelectedProduct) => Promise<boolean>;
   updateProduct: (
     id: number,
     productData: Partial<Product>,

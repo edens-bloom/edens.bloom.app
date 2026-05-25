@@ -49,11 +49,11 @@ const Hero: React.FC = () => {
           <img
             alt="Handcrafted Pipe Cleaner Bouquet"
             className="hero__img"
-            src="https://res.cloudinary.com/dkjqlvdxx/image/upload/v1778751222/WhatsApp_Image_2026-05-14_at_3.17.53_PM_dwpvhb.jpg"
+            src="https://res.cloudinary.com/dkjqlvdxx/image/upload/v1779699416/WhatsApp_Image_2026-05-25_at_2.35.52_PM_vfbuqr.jpg"
           />
           <div className="hero__float-card">
             <p className="hero__float-title">Artisan Rose Blush</p>
-            <p className="hero__float-price">{formatRs(6299)}</p>
+            <p className="hero__float-price">{formatRs(100)}</p>
           </div>
         </div>
       </div>

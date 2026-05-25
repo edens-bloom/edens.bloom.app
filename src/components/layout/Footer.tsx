@@ -112,13 +112,13 @@ const Footer: React.FC = () => {
             <form className="footer-form" onSubmit={handleSubmit}>
               <div className="footer-form__field">
                 <label className="footer-form__label" htmlFor="full_name">
-                  Full Name
+                  Full Name *
                 </label>
                 <input
                   className="footer-form__input"
                   id="full_name"
                   name="full_name"
-                  placeholder="Alex Rivers"
+                  placeholder="Name"
                   required
                   type="text"
                   value={formData.full_name}
@@ -133,7 +133,7 @@ const Footer: React.FC = () => {
                   className="footer-form__input"
                   id="phone"
                   name="phone"
-                  placeholder="+1 (555) 000-0000"
+                  placeholder=""
                   required
                   type="tel"
                   value={formData.phone}

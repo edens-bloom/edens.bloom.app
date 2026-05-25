@@ -2,51 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingBag, ArrowRight, Minus, Plus } from "lucide-react";
 import { useStore } from "../store/useStore";
-import type { Product } from "../models/types";
 import { formatRs } from "../utils/formatRs";
 import "./Cart.scss";
 import { OrderConfirmation } from "../components";
-
-type TierKey = "tier1" | "tier2" | "tier3";
+import type { SelectedProduct } from "../models/types";
 
 const Cart: React.FC = () => {
   const { cart, removeFromCart, updateQuantity, clearCart } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedTierByItem, setSelectedTierByItem] = useState<
-    Record<number, TierKey>
-  >({});
-
-  const getTierData = (item: Product, tier: TierKey) => {
-    const tierData = item.packages?.[tier];
-    const fallbackLabels: Record<TierKey, string> = {
-      tier1: "Basic",
-      tier2: "Standard",
-      tier3: "Premium",
-    };
-
-    const titleValue = tierData?.label;
-    const priceValue = tierData?.price;
-    const imageValue = tierData?.image;
-
-    return {
-      title:
-        typeof titleValue === "string" && titleValue.trim()
-          ? titleValue
-          : `${item.name} ${fallbackLabels[tier]}`,
-      label: fallbackLabels[tier],
-      price: Number(priceValue ?? item.price),
-      imageUrl: typeof imageValue === "string" ? imageValue : item.image,
-    };
-  };
-
-  const subtotal = cart.reduce((total, item) => {
-    const selectedTier = selectedTierByItem[item.id] || "tier1";
-    const selectedTierPrice = getTierData(item, selectedTier).price;
-    return total + selectedTierPrice * item.quantity;
-  }, 0);
-
-  const shipping = subtotal > 15000 ? 0 : 300;
-  const total = subtotal + shipping;
 
   const handleCheckout = () => setIsModalOpen(true);
 
@@ -73,6 +36,22 @@ const Cart: React.FC = () => {
     );
   }
 
+  const getLabelAndPrice = (item: SelectedProduct) => {
+    if (item.selectedAddOnId) {
+      const addOn = item.addOns?.find((a) => a.id === item.selectedAddOnId);
+      return `${addOn?.label || "Default"} (${formatRs(addOn?.price || 0)})`;
+    }
+    return ` (${formatRs(item.price)})`;
+  };
+
+  const selectedPrice = (item: SelectedProduct) => {
+    if (item.selectedAddOnId) {
+      const addOn = item.addOns?.find((a) => a.id === item.selectedAddOnId);
+      return addOn?.price || item.price;
+    }
+    return item.price;
+  };
+
   return (
     <div className="cart-page">
       <div className="cart-container">
@@ -89,21 +68,14 @@ const Cart: React.FC = () => {
           <div className="cart-grid">
             <section className="cart-items">
               {cart.map((item) => {
-                const selectedTier = selectedTierByItem[item.id] || "tier1";
-                const selectedTierData = getTierData(item, selectedTier);
-                const tier1 = getTierData(item, "tier1");
-                const tier2 = getTierData(item, "tier2");
-                const tier3 = getTierData(item, "tier3");
-                const itemTotal = selectedTierData.price * item.quantity;
-
                 return (
                   <article key={item.id} className="cart-item">
                     <div className="item-image-carousel">
                       <img
-                        src={selectedTierData.imageUrl}
+                        src={item.selectedImageUrl}
                         alt={item.name}
                         className="carousel-image fade-in"
-                        key={`${item.id}-${selectedTier}`}
+                        key={`${item.id}-${item.selectedAddOnId}`}
                       />
                     </div>
 
@@ -125,72 +97,31 @@ const Cart: React.FC = () => {
                       </div>
 
                       <div className="packaging-selector">
-                        <p className="selector-label">Package Options</p>
+                        {item.selectedAddOnId && (
+                          <p className="selector-label">Package Options</p>
+                        )}
                         <div className="radio-group">
-                          <label
-                            className={`radio-item ${selectedTier === "tier1" ? "active" : ""}`}
-                          >
+                          <label className="radio-item active">
                             <input
                               type="radio"
                               name={`tier-${item.id}`}
                               value="tier1"
-                              checked={selectedTier === "tier1"}
-                              onChange={() =>
-                                setSelectedTierByItem((prev) => ({
-                                  ...prev,
-                                  [item.id]: "tier1",
-                                }))
-                              }
+                              checked
+                              disabled
+                              // onChange={() =>
+                              //   setSelectedTierByItem((prev) => ({
+                              //     ...prev,
+                              //     [item.id]: "tier1",
+                              //   }))
+                              // }
                             />
-                            <span>
-                              {tier1.label} ({formatRs(tier1.price)})
-                            </span>
-                          </label>
-
-                          <label
-                            className={`radio-item ${selectedTier === "tier2" ? "active" : ""}`}
-                          >
-                            <input
-                              type="radio"
-                              name={`tier-${item.id}`}
-                              value="tier2"
-                              checked={selectedTier === "tier2"}
-                              onChange={() =>
-                                setSelectedTierByItem((prev) => ({
-                                  ...prev,
-                                  [item.id]: "tier2",
-                                }))
-                              }
-                            />
-                            <span>
-                              {tier2.label} ({formatRs(tier2.price)})
-                            </span>
-                          </label>
-
-                          <label
-                            className={`radio-item ${selectedTier === "tier3" ? "active" : ""}`}
-                          >
-                            <input
-                              type="radio"
-                              name={`tier-${item.id}`}
-                              value="tier3"
-                              checked={selectedTier === "tier3"}
-                              onChange={() =>
-                                setSelectedTierByItem((prev) => ({
-                                  ...prev,
-                                  [item.id]: "tier3",
-                                }))
-                              }
-                            />
-                            <span>
-                              {tier3.label} ({formatRs(tier3.price)})
-                            </span>
+                            <span>{getLabelAndPrice(item)}</span>
                           </label>
                         </div>
                       </div>
 
                       <div className="item-footer">
-                        <div className="item-quantity">
+                        {/* <div className="item-quantity">
                           <button
                             onClick={() =>
                               updateQuantity(item.id, item.quantity - 1)
@@ -208,17 +139,19 @@ const Cart: React.FC = () => {
                           >
                             <Plus size={16} />
                           </button>
-                        </div>
+                        </div> */}
 
                         <div className="item-price">
                           <p>
-                            {selectedTierData.title}: {item.quantity} x{" "}
-                            {formatRs(selectedTierData.price)} ={" "}
-                            {formatRs(itemTotal)}
+                            {item.name}: {item.quantity} x{" "}
+                            {formatRs(selectedPrice(item))}
+                            {/* {formatRs(
+                              item.subTotal || item.price * item.quantity,
+                            )} */}
                           </p>
                           <p className="item-total-row">
                             <span>Item Total:</span>{" "}
-                            <strong>{formatRs(itemTotal)}</strong>
+                            <strong>{formatRs(item.subTotal ?? 0)}</strong>
                           </p>
                         </div>
                       </div>
@@ -233,15 +166,15 @@ const Cart: React.FC = () => {
                 <h2>Order Summary</h2>
                 <div className="summary-row">
                   <span>Subtotal</span>
-                  <span>{formatRs(subtotal)}</span>
+                  <span>{formatRs(200)}</span>
                 </div>
                 <div className="summary-row">
                   <span>Shipping</span>
-                  <span>{shipping === 0 ? "FREE" : formatRs(shipping)}</span>
+                  <span>{cart.length === 0 ? "FREE" : formatRs(200)}</span>
                 </div>
                 <div className="summary-row total">
                   <span>Total</span>
-                  <span>{formatRs(total)}</span>
+                  <span>{formatRs(300)}</span>
                 </div>
 
                 <button className="checkout-btn" onClick={handleCheckout}>
@@ -249,7 +182,7 @@ const Cart: React.FC = () => {
                 </button>
 
                 <p className="shipping-note">
-                  {shipping === 0
+                  {cart.length === 0
                     ? "Shipping will be calculated at checkout."
                     : `Shipping calculated at checkout. Free shipping over ${formatRs(15000)}.`}
                 </p>
@@ -271,7 +204,7 @@ const Cart: React.FC = () => {
         <OrderConfirmation
           onClose={() => setIsModalOpen(false)}
           onConfirm={handleConfirmOrder}
-          total={total}
+          total={300}
         />
       )}
     </div>

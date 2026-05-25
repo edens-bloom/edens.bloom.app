@@ -31,12 +31,14 @@ const ProductGrid: React.FC = () => {
     fetchProducts,
     isLoading,
     error,
-    // addToCart,
+    addToCart,
     fetchProductById,
     selectedProduct,
     setSelectedProduct,
     updateSelectedProduct: updateSelected,
+    cart,
   } = useStore();
+  console.log("LOG", cart);
   const [addedFlash, setAddedFlash] = useState(false);
   useEffect(() => {
     fetchProducts();
@@ -101,7 +103,7 @@ const ProductGrid: React.FC = () => {
 
   const handleAddToCart = () => {
     if (!selectedProduct) return;
-
+    addToCart(selectedProduct);
     setAddedFlash(true);
     setTimeout(() => setAddedFlash(false), 1600);
   };
@@ -363,13 +365,13 @@ const ProductGrid: React.FC = () => {
                         </button>
                       </div>
                     </div> */}
-                    <div>
-                      <div className="product-modal__packaging">
-                        {(selectedProduct?.addOns?.length || 0) > 0 && (
-                          <>
-                            <p className="product-modal__section-label">
-                              Packaging selection
-                            </p>
+                    {selectedProduct.addOns &&
+                      selectedProduct.addOns.length > 0 && (
+                        <div>
+                          <p className="product-modal__section-label">
+                            Packaging selection
+                          </p>
+                          <div className="product-modal__packaging">
                             <button
                               type="button"
                               className={`product-modal__pack${!selectedProduct?.selectedAddOnId ? " product-modal__pack--active" : ""}`}
@@ -391,34 +393,36 @@ const ProductGrid: React.FC = () => {
                                 {formatRs(Number(selectedProduct.price ?? 0))}
                               </div>
                             </button>
-                          </>
-                        )}
-                        {selectedProduct?.addOns?.map((addon) => (
-                          <button
-                            key={addon.id}
-                            type="button"
-                            className={`product-modal__pack${selectedProduct?.selectedAddOnId === addon.id ? " product-modal__pack--active" : ""}`}
-                            onClick={() =>
-                              updateSelected(
-                                calculatePrice({
-                                  ...selectedProduct,
-                                  selectedAddOnId: addon.id ?? 0,
-                                  selectedAddOnPrice: Number(addon.price ?? 0),
-                                  selectedImageUrl: addon.imageUrl,
-                                }),
-                              )
-                            }
-                          >
-                            <div className="product-modal__pack-label">
-                              {addon.label}
-                            </div>
-                            <div className="product-modal__pack-price">
-                              {formatRs(Number(addon.price ?? 0))}
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+
+                            {selectedProduct?.addOns?.map((addon) => (
+                              <button
+                                key={addon.id}
+                                type="button"
+                                className={`product-modal__pack${selectedProduct?.selectedAddOnId === addon.id ? " product-modal__pack--active" : ""}`}
+                                onClick={() =>
+                                  updateSelected(
+                                    calculatePrice({
+                                      ...selectedProduct,
+                                      selectedAddOnId: addon.id ?? 0,
+                                      selectedAddOnPrice: Number(
+                                        addon.price ?? 0,
+                                      ),
+                                      selectedImageUrl: addon.imageUrl,
+                                    }),
+                                  )
+                                }
+                              >
+                                <div className="product-modal__pack-label">
+                                  {addon.label}
+                                </div>
+                                <div className="product-modal__pack-price">
+                                  {formatRs(Number(addon.price ?? 0))}
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     <div className="product-modal__qty-row">
                       <div className="product-modal__qty">
                         <button

@@ -113,18 +113,20 @@ export const useStore = create<BloomState>((set, get) => {
       }
     },
 
-    addToCart: async (product: Product, quantity: number = 1) => {
-      const qty = Math.max(1, Math.floor(Number(quantity) || 1));
+    addToCart: async (product: SelectedProduct) => {
+      // const qty = Math.max(1, Math.floor(Number(quantity) || 1));
       setDraft((state) => {
-        const existing = state.cart.find(
+        const index = state.cart.findIndex(
           (item: CartItem) =>
             item.id === product.id && item.price === product.price,
         );
-        if (existing) {
-          Object.assign(existing, product);
-          existing.quantity += qty;
+        if (index !== -1) {
+          state.cart[index].quantity += product.quantity;
+          state.cart[index] = calculatePrice(state.cart[index]);
         } else {
-          state.cart.push({ ...product, quantity: qty });
+          state.cart.push({
+            ...product,
+          });
         }
         saveCart(state.cart);
       });
