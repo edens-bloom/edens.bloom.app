@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { CheckCircle, Home, ShoppingBag } from "lucide-react";
 import { formatRs } from "../../utils/formatRs";
 import "./OrderConfirmation.scss";
+import { useStore } from "../../store/useStore";
+import type { User } from "../../models/types";
 
 interface OrderConfirmationProps {
   onClose: () => void;
@@ -20,31 +22,34 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
   onConfirm,
   total,
 }) => {
+  const { updateUser, user } = useStore();
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
-  const [userInfo, setUserInfo] = useState<UserInfo>({
-    name: "",
-    phone: "",
-    address: "",
-  });
+  const [description, setDescription] = useState("");
+  // const [user, setUserInfo] = useState<User>({
+  //   name: user?.name || "",
+  //   phoneNumber: user?.phoneNumber || "",
+  //   address: user?.address || "",
+  //   email: user?.email || "",
+  // });
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    setUserInfo((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    updateUser({ ...user, [name]: value } as Partial<User>);
   };
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (userInfo.name && userInfo.phone && userInfo.address) {
+    if (user?.name && user.phoneNumber && user.address) {
       setIsFormSubmitted(true);
     }
   };
 
-  const isFormValid = userInfo.name && userInfo.phone && userInfo.address;
+  const isFormValid =
+    (user?.name?.length || 0) > 2 &&
+    (user?.phoneNumber?.length || 0) === 10 &&
+    (user?.address?.length || 0) > 4;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -53,7 +58,10 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
           <>
             <div className="modal-header">
               <h2>Confirm Your Information</h2>
-              <p>Please provide your details to proceed with the order</p>
+              <p>
+                Please provide your details to proceed with your order. We’ll
+                call you to confirm. Thank you!
+              </p>
             </div>
 
             <form className="modal-body" onSubmit={handleFormSubmit}>
@@ -63,7 +71,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                   type="text"
                   id="name"
                   name="name"
-                  value={userInfo.name}
+                  value={user?.name || ""}
                   onChange={handleInputChange}
                   placeholder="Enter your full name"
                   required
@@ -75,8 +83,8 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                 <input
                   type="tel"
                   id="phone"
-                  name="phone"
-                  value={userInfo.phone}
+                  name="phoneNumber"
+                  value={user?.phoneNumber || ""}
                   onChange={handleInputChange}
                   placeholder="Enter your phone number"
                   required
@@ -85,12 +93,25 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
 
               <div className="form-group">
                 <label htmlFor="address">Delivery Address *</label>
+                <input
+                  type="text"
+                  id="address"
+                  name="address"
+                  value={user?.address || ""}
+                  onChange={handleInputChange}
+                  placeholder="Enter your delivery address"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="address">Description</label>
                 <textarea
                   id="address"
                   name="address"
-                  value={userInfo.address}
-                  onChange={handleInputChange}
-                  placeholder="Enter your delivery address"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Enter any additional details"
                   rows={3}
                   required
                 />
@@ -158,7 +179,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
               </button>
               <button
                 className="primary-btn"
-                onClick={() => onConfirm(userInfo)}
+                // onClick={() => onConfirm(userInfo)}
               >
                 <Home size={18} /> Return to Shop
               </button>

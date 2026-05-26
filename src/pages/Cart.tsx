@@ -31,7 +31,7 @@ const Cart: React.FC = () => {
     document.title = "Cart";
   }, []);
 
-  if (cart.length === 0) {
+  if (cart.items.length === 0) {
     return (
       <div className="cart-empty">
         <ShoppingBag size={64} />
@@ -68,14 +68,15 @@ const Cart: React.FC = () => {
             <h1>
               Shopping Cart{" "}
               <span>
-                ({cart.length} {cart.length > 1 ? "items" : "item"})
+                ({cart.items.length} {cart.items.length > 1 ? "items" : "item"})
               </span>
             </h1>
           </div>
 
           <div className="cart-grid">
             <section className="cart-items">
-              {cart.map((item) => {
+              {cart.items.map((cartItemData) => {
+                const item = cartItemData.item;
                 return (
                   <article key={item.id} className="cart-item">
                     <div className="item-image-carousel">
@@ -95,7 +96,9 @@ const Cart: React.FC = () => {
                         </div>
                         <button
                           className="remove-btn"
-                          onClick={() => removeFromCart(item.id)}
+                          onClick={() =>
+                            removeFromCart(item.id, item.selectedAddOnId)
+                          }
                           aria-label={`Remove ${item.name}`}
                         >
                           <span className="material-symbols-outlined">
@@ -116,12 +119,6 @@ const Cart: React.FC = () => {
                               value="tier1"
                               checked
                               disabled
-                              // onChange={() =>
-                              //   setSelectedTierByItem((prev) => ({
-                              //     ...prev,
-                              //     [item.id]: "tier1",
-                              //   }))
-                              // }
                             />
                             <span>{getLabelAndPrice(item)}</span>
                           </label>
@@ -134,19 +131,25 @@ const Cart: React.FC = () => {
                             onClick={() =>
                               updateCart({
                                 ...item,
-                                quantity: Math.max(1, item.quantity - 1),
+                                quantity: Math.max(
+                                  1,
+                                  cartItemData.quantity - 1,
+                                ),
                               })
                             }
                             aria-label="Decrease quantity"
                           >
                             <Minus size={16} />
                           </button>
-                          <span>{item.quantity}</span>
+                          <span>{cartItemData.quantity}</span>
                           <button
                             onClick={() =>
                               updateCart({
                                 ...item,
-                                quantity: Math.min(10, item.quantity + 1),
+                                quantity: Math.min(
+                                  10,
+                                  cartItemData.quantity + 1,
+                                ),
                               })
                             }
                             aria-label="Increase quantity"
@@ -157,15 +160,14 @@ const Cart: React.FC = () => {
 
                         <div className="item-price">
                           <p>
-                            {item.name}: {item.quantity} x{" "}
+                            {item.name}: {cartItemData.quantity} x{" "}
                             {formatRs(selectedPrice(item))}
-                            {/* {formatRs(
-                              item.subTotal || item.price * item.quantity,
-                            )} */}
                           </p>
                           <p className="item-total-row">
                             <span>Item Total:</span>{" "}
-                            <strong>{formatRs(item.subTotal ?? 0)}</strong>
+                            <strong>
+                              {formatRs(cartItemData.subtotal ?? 0)}
+                            </strong>
                           </p>
                         </div>
                       </div>
@@ -178,31 +180,31 @@ const Cart: React.FC = () => {
             <aside className="cart-summary">
               <div className="summary-card">
                 <h2>Order Summary</h2>
-                {/* <div className="summary-row">
+                <div className="summary-row">
                   <span>Subtotal</span>
-                  <span>
-                    {formatRs(
-                      cart.reduce(
-                        (total, item) => total + (item.subTotal ?? 0),
-                        0,
-                      ),
-                    )}
-                  </span>
-                </div> */}
-                {/* <div className="summary-row">
-                  <span>Shipping</span>
-                  <span>{cart.length === 0 ? "FREE" : formatRs(200)}</span>
-                </div> */}
+                  <span>{formatRs(cart.subtotal)}</span>
+                </div>
+                {cart.tax_amount > 0 && (
+                  <div className="summary-row">
+                    <span>Tax</span>
+                    <span>{formatRs(cart.tax_amount)}</span>
+                  </div>
+                )}
+                {cart.shipping_fee > 0 && (
+                  <div className="summary-row">
+                    <span>Shipping</span>
+                    <span>{formatRs(cart.shipping_fee)}</span>
+                  </div>
+                )}
+                {cart.discount_amount > 0 && (
+                  <div className="summary-row discount">
+                    <span>Discount</span>
+                    <span>-{formatRs(cart.discount_amount)}</span>
+                  </div>
+                )}
                 <div className="summary-row total">
                   <span>Total</span>
-                  <span>
-                    {formatRs(
-                      cart.reduce(
-                        (total, item) => total + (item.subTotal ?? 0),
-                        0,
-                      ),
-                    )}
-                  </span>
+                  <span>{formatRs(cart.total_amount)}</span>
                 </div>
 
                 <button className="checkout-btn" onClick={handleCheckout}>
@@ -210,7 +212,7 @@ const Cart: React.FC = () => {
                 </button>
 
                 {/* <p className="shipping-note">
-                  {cart.length === 0
+                  {cart.items.length === 0
                     ? "Shipping will be calculated at checkout."
                     : `Shipping calculated at checkout. Free shipping over ${formatRs(15000)}.`}
                 </p> */}
@@ -232,7 +234,7 @@ const Cart: React.FC = () => {
         <OrderConfirmation
           onClose={() => setIsModalOpen(false)}
           onConfirm={handleConfirmOrder}
-          total={300}
+          total={cart.total_amount}
         />
       )}
     </div>

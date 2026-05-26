@@ -55,20 +55,38 @@ export interface SelectedProduct extends Product {
   quantity: number;
 }
 
+export interface CartItemData {
+  item: SelectedProduct;
+  quantity: number;
+  subtotal?: number;
+}
+
+export interface CartState {
+  items: CartItemData[];
+  subtotal: number;
+  tax_amount: number;
+  discount_amount: number;
+  shipping_fee: number;
+  total_amount: number;
+}
+
 export interface CartItem extends Product {
   quantity: number;
 }
 
 export interface User {
-  id: number;
-  username: string;
-  email: string;
-  role: "admin" | "user";
+  id?: number;
+  userName?: string;
+  name?: string;
+  email?: string;
+  role?: "admin" | "user";
+  phoneNumber?: string;
+  address?: string;
 }
 
 export interface BloomState {
   products: Product[];
-  cart: SelectedProduct[];
+  cart: CartState;
   wishlist: number[];
   user: User | null;
   token: string | null;
@@ -79,7 +97,10 @@ export interface BloomState {
   fetchProducts: () => Promise<void>;
   fetchCart: () => Promise<void>;
   addToCart: (product: SelectedProduct) => Promise<void>;
-  removeFromCart: (productId: number) => Promise<void>;
+  removeFromCart: (
+    productId: number,
+    selectedAddOnId?: number | null,
+  ) => Promise<void>;
   updateQuantity: (productId: number, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
   toggleWishlist: (productId: number) => void;
@@ -96,4 +117,5 @@ export interface BloomState {
   fetchProductById: (id: number, isSelected?: boolean) => Promise<void>;
   updateSelectedProduct: (product: SelectedProduct) => void;
   updateCart: (item: SelectedProduct) => void;
+  updateUser: (user: Partial<User>) => void;
 }
