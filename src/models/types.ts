@@ -95,4 +95,5 @@ export interface BloomState {
   deleteProduct: (id: number) => Promise<boolean>;
   fetchProductById: (id: number, isSelected?: boolean) => Promise<void>;
   updateSelectedProduct: (product: SelectedProduct) => void;
+  updateCart: (item: SelectedProduct) => void;
 }

@@ -7,13 +7,21 @@ import "./Cart.scss";
 import { OrderConfirmation } from "../components";
 import type { SelectedProduct } from "../models/types";
 
+interface UserInfo {
+  name: string;
+  phone: string;
+  address: string;
+}
+
 const Cart: React.FC = () => {
   const { cart, removeFromCart, clearCart, updateCart } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleCheckout = () => setIsModalOpen(true);
 
-  const handleConfirmOrder = () => {
+  const handleConfirmOrder = (userInfo: UserInfo) => {
+    console.log("Order confirmed with user info:", userInfo);
+    // TODO: Send order to backend with userInfo
     clearCart();
     setIsModalOpen(false);
   };
