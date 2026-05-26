@@ -1,5 +1,5 @@
 import React from "react";
-import { formatRs } from "../../utils/formatRs";
+import AutoCarousel from "../AutoCarousel/AutoCarousel";
 
 const Hero: React.FC = () => {
   return (
@@ -32,30 +32,19 @@ const Hero: React.FC = () => {
             <div className="hero__stat-value">15+</div>
             <div className="hero__stat-label">Vibrant Hues</div>
           </div>
-          {/* Rating in Future */}
           <div>
             <div className="hero__stat-value">4.9★</div>
             <div className="hero__stat-label">Maker Rating</div>
           </div>
-          {/* <div>
-            <div className="hero__stat-value">Same Day or Next Day</div>
+          <div>
+            <div className="hero__stat-value">Same Day</div>
             <div className="hero__stat-label">Shipping</div>
-          </div> */}
+          </div>
         </div>
       </div>
       <div className="hero__visual">
         <div className="hero__glow" aria-hidden />
-        <div className="hero__frame ambient-shadow felt-texture">
-          <img
-            alt="Handcrafted Pipe Cleaner Bouquet"
-            className="hero__img"
-            src="https://res.cloudinary.com/dkjqlvdxx/image/upload/v1779699416/WhatsApp_Image_2026-05-25_at_2.35.52_PM_vfbuqr.jpg"
-          />
-          <div className="hero__float-card">
-            <p className="hero__float-title">Artisan Rose Blush</p>
-            <p className="hero__float-price">{formatRs(100)}</p>
-          </div>
-        </div>
+        <AutoCarousel />
       </div>
     </section>
   );
