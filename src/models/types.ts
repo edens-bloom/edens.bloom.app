@@ -47,31 +47,25 @@ export interface Product {
   imageUrl: string;
 }
 
+export interface CartItem extends SelectedProduct {
+  subTotal: number;
+}
+
 export interface SelectedProduct extends Product {
   selectedAddOnId: number | null;
   selectedAddOnPrice: number;
   selectedImageUrl: string;
-  subTotal?: number;
+  subTotal: number;
   quantity: number;
-}
-
-export interface CartItemData {
-  item: SelectedProduct;
-  quantity: number;
-  subtotal?: number;
 }
 
 export interface CartState {
-  items: CartItemData[];
-  subtotal: number;
-  tax_amount: number;
-  discount_amount: number;
-  shipping_fee: number;
-  total_amount: number;
-}
-
-export interface CartItem extends Product {
-  quantity: number;
+  items: CartItem[];
+  subTotal: number;
+  taxAmount: number;
+  discountAmount: number;
+  shippingFee: number;
+  totalAmount: number;
 }
 
 export interface User {
@@ -97,11 +91,8 @@ export interface BloomState {
   fetchProducts: () => Promise<void>;
   fetchCart: () => Promise<void>;
   addToCart: (product: SelectedProduct) => Promise<void>;
-  removeFromCart: (
-    productId: number,
-    selectedAddOnId?: number | null,
-  ) => Promise<void>;
-  updateQuantity: (productId: number, quantity: number) => Promise<void>;
+  removeFromCart: (item: CartItem) => void;
+  // updateQuantity: (productId: number, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
   toggleWishlist: (productId: number) => void;
   getCartTotal: () => number;

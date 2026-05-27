@@ -1,12 +1,12 @@
 import { create } from "zustand";
 import { produce, type Draft } from "immer";
 import type {
-  CartItemData,
   CartState,
   BloomState,
   Product,
   SelectedProduct,
   User,
+  CartItem,
 } from "../models/types";
 import { productService, authService } from "../services";
 import calculatePrice from "../utils/calculatePrice";
@@ -14,11 +14,11 @@ import calculatePrice from "../utils/calculatePrice";
 // Initialize empty cart state
 const initializeCart = (): CartState => ({
   items: [],
-  subtotal: 0,
-  tax_amount: 0,
-  discount_amount: 0,
-  shipping_fee: 0,
-  total_amount: 0,
+  subTotal: 0,
+  taxAmount: 0,
+  discountAmount: 0,
+  shippingFee: 0,
+  totalAmount: 0,
 });
 
 const getSelectedProductSubTotal = (product: SelectedProduct): number => {
@@ -26,56 +26,56 @@ const getSelectedProductSubTotal = (product: SelectedProduct): number => {
   return pricedProduct.subTotal ?? 0;
 };
 
-const loadCart = (): CartState => {
-  const raw = localStorage.getItem("bloom_cart");
-  if (!raw) return initializeCart();
+// const loadCart = (): CartState => {
+//   const raw = localStorage.getItem("bloom_cart");
+//   if (!raw) return initializeCart();
 
-  try {
-    const parsed = JSON.parse(raw);
+//   try {
+//     const parsed = JSON.parse(raw);
 
-    if (Array.isArray(parsed)) {
-      const items = parsed.map((product: SelectedProduct) => ({
-        item: calculatePrice(product),
-        quantity: product.quantity,
-        subtotal: getSelectedProductSubTotal(product),
-      }));
-      const subtotal = items.reduce(
-        (sum, item) => sum + (item.subtotal || 0),
-        0,
-      );
-      return {
-        items,
-        subtotal,
-        tax_amount: 0,
-        discount_amount: 0,
-        shipping_fee: 0,
-        total_amount: subtotal,
-      };
-    }
+//     if (Array.isArray(parsed)) {
+//       const items = parsed.map((product: SelectedProduct) => ({
+//         item: calculatePrice(product),
+//         quantity: product.quantity,
+//         subtotal: getSelectedProductSubTotal(product),
+//       }));
+//       const subtotal = items.reduce(
+//         (sum, item) => sum + (item.subtotal || 0),
+//         0,
+//       );
+//       return {
+//         items,
+//         subtotal,
+//         tax_amount: 0,
+//         discount_amount: 0,
+//         shipping_fee: 0,
+//         total_amount: subtotal,
+//       };
+//     }
 
-    const parsedItems = (parsed.items || []) as Array<{
-      item: SelectedProduct;
-      quantity?: number;
-      subtotal?: number;
-    }>;
-    const items = parsedItems.map((entry) => ({
-      item: calculatePrice(entry.item),
-      quantity: Number(entry.quantity || 0),
-      subtotal: Number(entry.subtotal || 0),
-    }));
+//     const parsedItems = (parsed.items || []) as Array<{
+//       item: SelectedProduct;
+//       quantity?: number;
+//       subtotal?: number;
+//     }>;
+//     const items = parsedItems.map((entry) => ({
+//       item: calculatePrice(entry.item),
+//       quantity: Number(entry.quantity || 0),
+//       subtotal: Number(entry.subtotal || 0),
+//     }));
 
-    return {
-      items,
-      subtotal: Number(parsed.subtotal || 0),
-      tax_amount: Number(parsed.tax_amount || 0),
-      discount_amount: Number(parsed.discount_amount || 0),
-      shipping_fee: Number(parsed.shipping_fee || 0),
-      total_amount: Number(parsed.total_amount || 0),
-    };
-  } catch {
-    return initializeCart();
-  }
-};
+//     return {
+//       items,
+//       subtotal: Number(parsed.subtotal || 0),
+//       tax_amount: Number(parsed.tax_amount || 0),
+//       discount_amount: Number(parsed.discount_amount || 0),
+//       shipping_fee: Number(parsed.shipping_fee || 0),
+//       total_amount: Number(parsed.total_amount || 0),
+//     };
+//   } catch {
+//     return initializeCart();
+//   }
+// };
 
 export const useStore = create<BloomState>((set, get) => {
   const setDraft = (fn: (draft: Draft<BloomState>) => void) => set(produce(fn));
@@ -83,7 +83,9 @@ export const useStore = create<BloomState>((set, get) => {
   return {
     products: [],
     selectedProduct: {} as SelectedProduct,
-    cart: loadCart(),
+    cart: JSON.parse(
+      localStorage.getItem("bloom_cart") || JSON.stringify(initializeCart()),
+    ) as CartState,
     wishlist: JSON.parse(localStorage.getItem("bloom_wishlist") || "[]"),
     user: JSON.parse(localStorage.getItem("bloom_user") || "null"),
     token: localStorage.getItem("bloom_token"),
@@ -138,6 +140,7 @@ export const useStore = create<BloomState>((set, get) => {
               selectedAddOnId: null,
               selectedAddOnPrice: 0,
               selectedImageUrl: existing.imageUrl,
+              subTotal: existing.price,
             });
           }
         });
@@ -183,43 +186,32 @@ export const useStore = create<BloomState>((set, get) => {
 
     addToCart: async (product: SelectedProduct) => {
       setDraft((state) => {
-        const itemTotal = getSelectedProductSubTotal(product);
         const index = state.cart.items.findIndex(
-          (item: CartItemData) =>
-            item.item.id === product.id &&
-            item.item.price === product.price &&
-            item.item.selectedAddOnId === product.selectedAddOnId,
+          (item: SelectedProduct) =>
+            item.id === product.id &&
+            item.price === product.price &&
+            item.selectedAddOnId === product.selectedAddOnId,
         );
         if (index !== -1) {
           const existingItem = state.cart.items[index];
           existingItem.quantity += product.quantity;
-          existingItem.item = calculatePrice({
-            ...existingItem.item,
-            quantity: existingItem.quantity,
-          });
-          existingItem.subtotal = getSelectedProductSubTotal(existingItem.item);
         } else {
-          state.cart.items.push({
-            item: calculatePrice(product),
-            quantity: product.quantity,
-            subtotal: itemTotal,
-          });
+          state.cart.items.push({ ...calculatePrice(product) });
         }
         updateCartTotals(state.cart);
         saveCart(state.cart);
       });
     },
 
-    removeFromCart: async (
-      productId: number,
-      selectedAddOnId?: number | null,
-    ) => {
+    removeFromCart: async (cartItem: CartItem) => {
       setDraft((state) => {
-        state.cart.items = state.cart.items.filter(
-          (item: CartItemData) =>
-            item.item.id !== productId ||
-            item.item.selectedAddOnId !== selectedAddOnId,
+        const index = state.cart.items.findIndex(
+          (item: CartItem) =>
+            item.id === cartItem.id &&
+            item.price === cartItem.price &&
+            item.selectedAddOnId === cartItem.selectedAddOnId,
         );
+        if (index !== -1) state.cart.items.splice(index, 1);
         updateCartTotals(state.cart);
         saveCart(state.cart);
       });
@@ -228,42 +220,41 @@ export const useStore = create<BloomState>((set, get) => {
     updateCart: (cart: SelectedProduct) => {
       setDraft((state) => {
         const index = state.cart.items.findIndex(
-          (item: CartItemData) =>
-            item.item.id === cart.id &&
-            item.item.selectedAddOnId === cart.selectedAddOnId,
+          (item: CartItem) =>
+            item.id === cart.id &&
+            item.price === cart.price &&
+            item.selectedAddOnId === cart.selectedAddOnId,
         );
         if (index !== -1) {
           const updatedItem = calculatePrice(cart);
-          state.cart.items[index].item = updatedItem;
-          state.cart.items[index].quantity = updatedItem.quantity;
-          state.cart.items[index].subtotal =
-            getSelectedProductSubTotal(updatedItem);
+          state.cart.items[index] = updatedItem;
+          getSelectedProductSubTotal(updatedItem);
         }
         updateCartTotals(state.cart);
         saveCart(state.cart);
       });
     },
 
-    updateQuantity: async (productId: number, quantity: number) => {
-      setDraft((state) => {
-        const existing = state.cart.items.find(
-          (item: CartItemData) => item.item.id === productId,
-        );
-        if (existing) {
-          existing.quantity = Math.max(0, quantity);
-          existing.item = calculatePrice({
-            ...existing.item,
-            quantity: existing.quantity,
-          });
-          existing.subtotal = getSelectedProductSubTotal(existing.item);
-        }
-        state.cart.items = state.cart.items.filter(
-          (item: CartItemData) => item.quantity > 0,
-        );
-        updateCartTotals(state.cart);
-        saveCart(state.cart);
-      });
-    },
+    // updateQuantity: async (productId: number, quantity: number) => {
+    //   setDraft((state) => {
+    //     const existing = state.cart.items.find(
+    //       (item: CartItemData) => item.item.id === productId,
+    //     );
+    //     if (existing) {
+    //       existing.quantity = Math.max(0, quantity);
+    //       existing.item = calculatePrice({
+    //         ...existing.item,
+    //         quantity: existing.quantity,
+    //       });
+    //       existing.subtotal = getSelectedProductSubTotal(existing.item);
+    //     }
+    //     state.cart.items = state.cart.items.filter(
+    //       (item: CartItemData) => item.quantity > 0,
+    //     );
+    //     updateCartTotals(state.cart);
+    //     saveCart(state.cart);
+    //   });
+    // },
 
     clearCart: async () => {
       const newCart = initializeCart();
@@ -287,12 +278,12 @@ export const useStore = create<BloomState>((set, get) => {
 
     getCartTotal: () => {
       const { cart } = get();
-      return cart.total_amount;
+      return cart.totalAmount;
     },
 
     getCartCount: () => {
       const { cart } = get();
-      return cart.items.reduce((count, item) => count + item.quantity, 0);
+      return cart?.items?.reduce((count, item) => count + item.quantity, 0);
     },
 
     login: async (username: string, password: string) => {
@@ -431,12 +422,12 @@ const saveCart = (cart: CartState) => {
 
 // Helper to update cart totals
 const updateCartTotals = (cart: CartState) => {
-  cart.subtotal = cart.items.reduce(
-    (sum, item) => sum + (item.subtotal || 0),
+  cart.subTotal = cart.items.reduce(
+    (sum, item) => sum + (item.subTotal || 0),
     0,
   );
-  cart.total_amount =
-    cart.subtotal + cart.tax_amount + cart.shipping_fee - cart.discount_amount;
+  cart.totalAmount =
+    cart.subTotal + cart.taxAmount + cart.shippingFee - cart.discountAmount;
 };
 
 const saveUser = (user: User | null) => {

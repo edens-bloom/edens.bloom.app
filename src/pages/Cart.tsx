@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ShoppingBag, ArrowRight, Minus, Plus } from "lucide-react";
 import { useStore } from "../store/useStore";
 import { formatRs } from "../utils/formatRs";
@@ -16,6 +16,7 @@ interface UserInfo {
 const Cart: React.FC = () => {
   const { cart, removeFromCart, clearCart, updateCart } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleCheckout = () => setIsModalOpen(true);
 
@@ -75,10 +76,9 @@ const Cart: React.FC = () => {
 
           <div className="cart-grid">
             <section className="cart-items">
-              {cart.items.map((cartItemData) => {
-                const item = cartItemData.item;
+              {cart.items.map((item, i) => {
                 return (
-                  <article key={item.id} className="cart-item">
+                  <article key={`item-${item.id}-${i}`} className="cart-item">
                     <div className="item-image-carousel">
                       <img
                         src={item.selectedImageUrl}
@@ -96,9 +96,7 @@ const Cart: React.FC = () => {
                         </div>
                         <button
                           className="remove-btn"
-                          onClick={() =>
-                            removeFromCart(item.id, item.selectedAddOnId)
-                          }
+                          onClick={() => removeFromCart(item)}
                           aria-label={`Remove ${item.name}`}
                         >
                           <span className="material-symbols-outlined">
@@ -131,25 +129,19 @@ const Cart: React.FC = () => {
                             onClick={() =>
                               updateCart({
                                 ...item,
-                                quantity: Math.max(
-                                  1,
-                                  cartItemData.quantity - 1,
-                                ),
+                                quantity: Math.max(1, item.quantity - 1),
                               })
                             }
                             aria-label="Decrease quantity"
                           >
                             <Minus size={16} />
                           </button>
-                          <span>{cartItemData.quantity}</span>
+                          <span>{item.quantity}</span>
                           <button
                             onClick={() =>
                               updateCart({
                                 ...item,
-                                quantity: Math.min(
-                                  10,
-                                  cartItemData.quantity + 1,
-                                ),
+                                quantity: Math.min(10, item.quantity + 1),
                               })
                             }
                             aria-label="Increase quantity"
@@ -160,14 +152,12 @@ const Cart: React.FC = () => {
 
                         <div className="item-price">
                           <p>
-                            {item.name}: {cartItemData.quantity} x{" "}
+                            {item.name}: {item.quantity} x{" "}
                             {formatRs(selectedPrice(item))}
                           </p>
                           <p className="item-total-row">
                             <span>Item Total:</span>{" "}
-                            <strong>
-                              {formatRs(cartItemData.subtotal ?? 0)}
-                            </strong>
+                            <strong>{formatRs(item.subTotal ?? 0)}</strong>
                           </p>
                         </div>
                       </div>
@@ -182,29 +172,29 @@ const Cart: React.FC = () => {
                 <h2>Order Summary</h2>
                 <div className="summary-row">
                   <span>Subtotal</span>
-                  <span>{formatRs(cart.subtotal)}</span>
+                  <span>{formatRs(cart.subTotal)}</span>
                 </div>
-                {cart.tax_amount > 0 && (
+                {cart.taxAmount > 0 && (
                   <div className="summary-row">
                     <span>Tax</span>
-                    <span>{formatRs(cart.tax_amount)}</span>
+                    <span>{formatRs(cart.taxAmount)}</span>
                   </div>
                 )}
-                {cart.shipping_fee > 0 && (
+                {cart.shippingFee > 0 && (
                   <div className="summary-row">
                     <span>Shipping</span>
-                    <span>{formatRs(cart.shipping_fee)}</span>
+                    <span>{formatRs(cart.shippingFee)}</span>
                   </div>
                 )}
-                {cart.discount_amount > 0 && (
+                {cart.discountAmount > 0 && (
                   <div className="summary-row discount">
                     <span>Discount</span>
-                    <span>-{formatRs(cart.discount_amount)}</span>
+                    <span>-{formatRs(cart.discountAmount)}</span>
                   </div>
                 )}
                 <div className="summary-row total">
                   <span>Total</span>
-                  <span>{formatRs(cart.total_amount)}</span>
+                  <span>{formatRs(cart.totalAmount)}</span>
                 </div>
 
                 <button className="checkout-btn" onClick={handleCheckout}>
@@ -232,9 +222,12 @@ const Cart: React.FC = () => {
 
       {isModalOpen && (
         <OrderConfirmation
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            setIsModalOpen(false);
+            navigate("/");
+          }}
           onConfirm={handleConfirmOrder}
-          total={cart.total_amount}
+          total={cart.totalAmount}
         />
       )}
     </div>

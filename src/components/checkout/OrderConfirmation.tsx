@@ -4,6 +4,7 @@ import { formatRs } from "../../utils/formatRs";
 import "./OrderConfirmation.scss";
 import { useStore } from "../../store/useStore";
 import type { User } from "../../models/types";
+import { useNavigate } from "react-router-dom";
 
 interface OrderConfirmationProps {
   onClose: () => void;
@@ -22,9 +23,10 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
   onConfirm,
   total,
 }) => {
-  const { updateUser, user } = useStore();
+  const { updateUser, user, clearCart } = useStore();
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [description, setDescription] = useState("");
+  const navigate = useNavigate();
   // const [user, setUserInfo] = useState<User>({
   //   name: user?.name || "",
   //   phoneNumber: user?.phoneNumber || "",
@@ -113,7 +115,6 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Enter any additional details"
                   rows={3}
-                  required
                 />
               </div>
 
@@ -179,7 +180,10 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
               </button>
               <button
                 className="primary-btn"
-                // onClick={() => onConfirm(userInfo)}
+                onClick={() => {
+                  clearCart();
+                  navigate("/");
+                }}
               >
                 <Home size={18} /> Return to Shop
               </button>
