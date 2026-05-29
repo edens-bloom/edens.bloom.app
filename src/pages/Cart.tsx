@@ -21,7 +21,6 @@ const Cart: React.FC = () => {
   const handleCheckout = () => setIsModalOpen(true);
 
   const handleConfirmOrder = (userInfo: UserInfo) => {
-    console.log("Order confirmed with user info:", userInfo);
     // TODO: Send order to backend with userInfo
     clearCart();
     setIsModalOpen(false);

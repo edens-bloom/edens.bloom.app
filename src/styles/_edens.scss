@@ -784,6 +784,7 @@
   padding: 20px 10px;
   display: flex;
   flex-direction: column;
+  max-width: 320px;
   gap: 5px;
   transition: box-shadow 0.3s ease;
   box-shadow: 0 5px 5px 2px rgba(211, 211, 211, 0.4);
@@ -932,7 +933,7 @@
   @include type-headline-lg;
   font-size: 20px;
   color: $color-on-background;
-  white-space: nowrap;
+  // white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }

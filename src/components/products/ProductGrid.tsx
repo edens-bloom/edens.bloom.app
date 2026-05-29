@@ -36,9 +36,7 @@ const ProductGrid: React.FC = () => {
     selectedProduct,
     setSelectedProduct,
     updateSelectedProduct: updateSelected,
-    cart,
   } = useStore();
-  console.log("LOG", cart);
   const [addedFlash, setAddedFlash] = useState(false);
   useEffect(() => {
     fetchProducts();
