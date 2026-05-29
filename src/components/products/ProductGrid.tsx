@@ -37,6 +37,7 @@ const ProductGrid: React.FC = () => {
     setSelectedProduct,
     updateSelectedProduct: updateSelected,
   } = useStore();
+  console.log("LOG, selectedProduct", selectedProduct);
   const [addedFlash, setAddedFlash] = useState(false);
   useEffect(() => {
     fetchProducts();
@@ -204,7 +205,7 @@ const ProductGrid: React.FC = () => {
                     <div className="product-modal__main-img-wrap ambient-shadow">
                       {getSelectedImage(selectedProduct)}
                     </div>
-                    {(selectedProduct?.addOns?.length || 0) > 1 && (
+                    {(selectedProduct?.addOns?.length || 0) > 0 && (
                       <div
                         className="product-modal__thumbs"
                         role="tablist"
