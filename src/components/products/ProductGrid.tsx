@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useStore } from "../../store/useStore";
-import { Loader2, ShoppingBag, X } from "lucide-react";
+import { ShoppingBag, X } from "lucide-react";
 import type { Product, SelectedProduct } from "../../models/types";
 import { formatRs } from "../../utils/formatRs";
 import Badge, { type BadgeType } from "./Badge";
 import "./ProductGrid.scss";
 import calculatePrice from "../../utils/calculatePrice";
+import { DNA } from "react-loader-spinner";
 
 const getSelectedImage = (product: SelectedProduct) => {
   if (!product?.id) return product?.imageUrl;
@@ -36,8 +37,9 @@ const ProductGrid: React.FC = () => {
     selectedProduct,
     setSelectedProduct,
     updateSelectedProduct: updateSelected,
+    loading: { fetchById: isFetchingById },
   } = useStore();
-  console.log("LOG, selectedProduct", selectedProduct);
+  const [showModal, setShowModal] = useState(false);
   const [addedFlash, setAddedFlash] = useState(false);
   useEffect(() => {
     fetchProducts();
@@ -57,11 +59,13 @@ const ProductGrid: React.FC = () => {
   }, [selectedProduct?.id]);
 
   const handleProductClick = async (product: Product) => {
+    setShowModal(true);
     await fetchProductById(product.id, true);
     // body scroll lock now handled in useEffect
   };
 
   const handleCloseModal = useCallback(() => {
+    setShowModal(false);
     setSelectedProduct({} as SelectedProduct);
     // body scroll lock now handled in useEffect
   }, [setSelectedProduct]);
@@ -79,7 +83,14 @@ const ProductGrid: React.FC = () => {
   if (isLoading) {
     return (
       <div className="page-container product-grid__state product-grid__state--loading">
-        <Loader2 className="product-grid__spinner" size={48} />
+        <DNA
+          visible={true}
+          height="80"
+          width="80"
+          ariaLabel="dna-loading"
+          wrapperStyle={{}}
+          wrapperClass="dna-wrapper"
+        />
         <p className="type-label-md">Loading our beautiful collection...</p>
       </div>
     );
@@ -187,122 +198,142 @@ const ProductGrid: React.FC = () => {
         </div>
       </section>
 
-      {selectedProduct?.id &&
+      {showModal &&
         createPortal(
           <div className="product-modal-overlay" onClick={handleCloseModal}>
             <div className="product-modal" onClick={(e) => e.stopPropagation()}>
-              <button
-                type="button"
-                className="product-modal__close"
-                onClick={handleCloseModal}
-                aria-label="Close modal"
-              >
-                <X size={20} />
-              </button>
-              <div className="product-modal__scroll">
-                <div className="product-modal__grid">
-                  <div className="product-modal__gallery">
-                    <div className="product-modal__main-img-wrap ambient-shadow">
-                      {getSelectedImage(selectedProduct)}
-                    </div>
-                    {(selectedProduct?.addOns?.length || 0) > 0 && (
-                      <div
-                        className="product-modal__thumbs"
-                        role="tablist"
-                        aria-label="Product images"
-                      >
-                        <button
-                          key={`${selectedProduct.id}-main`}
-                          type="button"
-                          className={`product-modal__thumb${!selectedProduct.selectedAddOnId ? " product-modal__thumb--active" : ""}`}
-                          onClick={() =>
-                            updateSelected(
-                              calculatePrice({
-                                ...selectedProduct,
-                                selectedAddOnId: null,
-                                selectedAddOnPrice: 0,
-                                selectedImageUrl: selectedProduct.imageUrl,
-                              }),
-                            )
-                          }
-                          aria-label={`View image ${1}`}
-                        >
-                          <img src={selectedProduct.imageUrl} alt="" />
-                        </button>
-                        {selectedProduct?.addOns?.map((addon, i) => (
-                          <button
-                            key={addon.id}
-                            type="button"
-                            className={`product-modal__thumb${selectedProduct.selectedAddOnId === addon.id ? " product-modal__thumb--active" : ""}`}
-                            onClick={() =>
-                              updateSelected(
-                                calculatePrice({
-                                  ...selectedProduct,
-                                  selectedAddOnId: addon.id ?? 0,
-                                  selectedAddOnPrice: Number(addon.price ?? 0),
-                                  selectedImageUrl: addon.imageUrl,
-                                }),
-                              )
-                            }
-                            aria-label={`View image ${i + 1}`}
-                          >
-                            <img src={addon.imageUrl} alt="" />
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    <p className="product-modal__desc">
-                      {selectedProduct.description}
-                    </p>
-                  </div>
-                  <div className="product-modal__info">
-                    <div className="product-modal__meta-row">
-                      {selectedProduct.badge ? (
-                        <span className="product-modal__badge">
-                          {selectedProduct.badge}
-                        </span>
-                      ) : null}
-                      <div
-                        className="product-modal__stars"
-                        aria-label={`${selectedProduct.rating} out of 5 stars`}
-                      >
-                        {Array.from({ length: 5 }, (_, i) => (
-                          <span
-                            key={i}
-                            className={
-                              i < fullStars
-                                ? "product-modal__star"
-                                : "product-modal__star product-modal__star--muted"
-                            }
-                          >
-                            ★
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <h1 className="product-modal__title">
-                      {selectedProduct.name}
-                    </h1>
-                    <p className="product-modal__price">
-                      {formatRs(
-                        selectedProduct.subTotal ?? selectedProduct.price,
-                      )}
-                      {selectedProduct.quantity > 1 && (
-                        <span
-                          style={{
-                            fontSize: "0.8rem",
-                            fontWeight: "normal",
-                            marginLeft: "8px",
-                            opacity: 0.8,
-                          }}
-                        >
-                          ({selectedProduct.quantity} &times;{" "}
-                          {formatRs(getCurrentPrice(selectedProduct))})
-                        </span>
-                      )}
-                    </p>
+              {isFetchingById ? (
+                <div className="page-container product-grid__state product-grid__state--loading">
+                  <DNA
+                    visible={true}
+                    height="80"
+                    width="80"
+                    ariaLabel="dna-loading"
+                    wrapperStyle={{}}
+                    wrapperClass="dna-wrapper"
+                  />
+                  <p className="type-label-md">
+                    Loading our beautiful collection...
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <div>
+                    <button
+                      type="button"
+                      className="product-modal__close"
+                      onClick={handleCloseModal}
+                      aria-label="Close modal"
+                    >
+                      <X size={20} />
+                    </button>
+                    <div className="product-modal__scroll">
+                      <div className="product-modal__grid">
+                        <div className="product-modal__gallery">
+                          <div className="product-modal__main-img-wrap ambient-shadow">
+                            {getSelectedImage(selectedProduct)}
+                          </div>
+                          {(selectedProduct?.addOns?.length || 0) > 0 && (
+                            <div
+                              className="product-modal__thumbs"
+                              role="tablist"
+                              aria-label="Product images"
+                            >
+                              <button
+                                key={`${selectedProduct.id}-main`}
+                                type="button"
+                                className={`product-modal__thumb${!selectedProduct.selectedAddOnId ? " product-modal__thumb--active" : ""}`}
+                                onClick={() =>
+                                  updateSelected(
+                                    calculatePrice({
+                                      ...selectedProduct,
+                                      selectedAddOnId: null,
+                                      selectedAddOnPrice: 0,
+                                      selectedImageUrl:
+                                        selectedProduct.imageUrl,
+                                    }),
+                                  )
+                                }
+                                aria-label={`View image ${1}`}
+                              >
+                                <img src={selectedProduct.imageUrl} alt="" />
+                              </button>
+                              {selectedProduct?.addOns?.map((addon, i) => (
+                                <button
+                                  key={addon.id}
+                                  type="button"
+                                  className={`product-modal__thumb${selectedProduct.selectedAddOnId === addon.id ? " product-modal__thumb--active" : ""}`}
+                                  onClick={() =>
+                                    updateSelected(
+                                      calculatePrice({
+                                        ...selectedProduct,
+                                        selectedAddOnId: addon.id ?? 0,
+                                        selectedAddOnPrice: Number(
+                                          addon.price ?? 0,
+                                        ),
+                                        selectedImageUrl: addon.imageUrl,
+                                      }),
+                                    )
+                                  }
+                                  aria-label={`View image ${i + 1}`}
+                                >
+                                  <img src={addon.imageUrl} alt="" />
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className="product-modal__info">
+                          <div className="product-modal__meta-row">
+                            {selectedProduct.badge ? (
+                              <span className="product-modal__badge">
+                                {selectedProduct.badge}
+                              </span>
+                            ) : null}
+                            <div
+                              className="product-modal__stars"
+                              aria-label={`${selectedProduct.rating} out of 5 stars`}
+                            >
+                              {Array.from({ length: 5 }, (_, i) => (
+                                <span
+                                  key={i}
+                                  className={
+                                    i < fullStars
+                                      ? "product-modal__star"
+                                      : "product-modal__star product-modal__star--muted"
+                                  }
+                                >
+                                  ★
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <h1 className="product-modal__title">
+                            {selectedProduct.name}
+                          </h1>
+                          <p className="product-modal__price">
+                            {formatRs(
+                              selectedProduct.subTotal ?? selectedProduct.price,
+                            )}
+                            {selectedProduct.quantity > 1 && (
+                              <span
+                                style={{
+                                  fontSize: "0.8rem",
+                                  fontWeight: "normal",
+                                  marginLeft: "8px",
+                                  opacity: 0.8,
+                                }}
+                              >
+                                ({selectedProduct.quantity} &times;{" "}
+                                {formatRs(getCurrentPrice(selectedProduct))})
+                              </span>
+                            )}
+                          </p>
+                          <p className="product-modal__desc">
+                            {selectedProduct.description}
+                          </p>
 
-                    {/* <div>
+                          {/* <div>
                       <p className="product-modal__section-label">
                         Bundle &amp; save
                       </p>
@@ -364,138 +395,150 @@ const ProductGrid: React.FC = () => {
                         </button>
                       </div>
                     </div> */}
-                    {selectedProduct.addOns &&
-                      selectedProduct.addOns.length > 0 && (
-                        <div>
-                          <p className="product-modal__section-label">
-                            Packaging selection
-                          </p>
-                          <div className="product-modal__packaging">
-                            <button
-                              type="button"
-                              className={`product-modal__pack${!selectedProduct?.selectedAddOnId ? " product-modal__pack--active" : ""}`}
-                              onClick={() =>
-                                updateSelected(
-                                  calculatePrice({
-                                    ...selectedProduct,
-                                    selectedAddOnId: null,
-                                    selectedAddOnPrice: 0,
-                                    selectedImageUrl: selectedProduct.imageUrl,
-                                  }),
-                                )
-                              }
-                            >
-                              <div className="product-modal__pack-label">
-                                No bag
-                              </div>
-                              <div className="product-modal__pack-price">
-                                {formatRs(Number(selectedProduct.price ?? 0))}
-                              </div>
-                            </button>
+                          {selectedProduct.addOns &&
+                            selectedProduct.addOns.length > 0 && (
+                              <div>
+                                <p className="product-modal__section-label">
+                                  Packaging selection
+                                </p>
+                                <div className="product-modal__packaging">
+                                  <button
+                                    type="button"
+                                    className={`product-modal__pack${!selectedProduct?.selectedAddOnId ? " product-modal__pack--active" : ""}`}
+                                    onClick={() =>
+                                      updateSelected(
+                                        calculatePrice({
+                                          ...selectedProduct,
+                                          selectedAddOnId: null,
+                                          selectedAddOnPrice: 0,
+                                          selectedImageUrl:
+                                            selectedProduct.imageUrl,
+                                        }),
+                                      )
+                                    }
+                                  >
+                                    <div className="product-modal__pack-label">
+                                      No bag
+                                    </div>
+                                    <div className="product-modal__pack-price">
+                                      {formatRs(
+                                        Number(selectedProduct.price ?? 0),
+                                      )}
+                                    </div>
+                                  </button>
 
-                            {selectedProduct?.addOns?.map((addon) => (
+                                  {selectedProduct?.addOns?.map((addon) => (
+                                    <button
+                                      key={addon.id}
+                                      type="button"
+                                      className={`product-modal__pack${selectedProduct?.selectedAddOnId === addon.id ? " product-modal__pack--active" : ""}`}
+                                      onClick={() =>
+                                        updateSelected(
+                                          calculatePrice({
+                                            ...selectedProduct,
+                                            selectedAddOnId: addon.id ?? 0,
+                                            selectedAddOnPrice: Number(
+                                              addon.price ?? 0,
+                                            ),
+                                            selectedImageUrl: addon.imageUrl,
+                                          }),
+                                        )
+                                      }
+                                    >
+                                      <div className="product-modal__pack-label">
+                                        {addon.label}
+                                      </div>
+                                      <div className="product-modal__pack-price">
+                                        {formatRs(Number(addon.price ?? 0))}
+                                      </div>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          <div className="product-modal__qty-row">
+                            <div className="product-modal__qty">
                               <button
-                                key={addon.id}
                                 type="button"
-                                className={`product-modal__pack${selectedProduct?.selectedAddOnId === addon.id ? " product-modal__pack--active" : ""}`}
-                                onClick={() =>
+                                className="product-modal__qty-btn"
+                                onClick={() => {
                                   updateSelected(
                                     calculatePrice({
                                       ...selectedProduct,
-                                      selectedAddOnId: addon.id ?? 0,
-                                      selectedAddOnPrice: Number(
-                                        addon.price ?? 0,
+                                      quantity: Math.max(
+                                        1,
+                                        selectedProduct.quantity - 1,
                                       ),
-                                      selectedImageUrl: addon.imageUrl,
                                     }),
-                                  )
-                                }
+                                  );
+                                }}
+                                aria-label="Decrease quantity"
                               >
-                                <div className="product-modal__pack-label">
-                                  {addon.label}
-                                </div>
-                                <div className="product-modal__pack-price">
-                                  {formatRs(Number(addon.price ?? 0))}
-                                </div>
+                                −
                               </button>
-                            ))}
+                              <span className="product-modal__qty-val">
+                                {selectedProduct.quantity}
+                              </span>
+                              <button
+                                type="button"
+                                className="product-modal__qty-btn"
+                                onClick={() => {
+                                  updateSelected(
+                                    calculatePrice({
+                                      ...selectedProduct,
+                                      quantity: Math.min(
+                                        10,
+                                        selectedProduct.quantity + 1,
+                                      ),
+                                    }),
+                                  );
+                                }}
+                                aria-label="Increase quantity"
+                              >
+                                +
+                              </button>
+                            </div>
+                            <button
+                              type="button"
+                              className="product-modal__add-btn"
+                              onClick={handleAddToCart}
+                            >
+                              <ShoppingBag size={20} aria-hidden />
+                              {addedFlash ? "Added to cart" : "Add to cart"}
+                            </button>
                           </div>
-                        </div>
-                      )}
-                    <div className="product-modal__qty-row">
-                      <div className="product-modal__qty">
-                        <button
-                          type="button"
-                          className="product-modal__qty-btn"
-                          onClick={() => {
-                            updateSelected(
-                              calculatePrice({
-                                ...selectedProduct,
-                                quantity: Math.max(
-                                  1,
-                                  selectedProduct.quantity - 1,
-                                ),
-                              }),
-                            );
-                          }}
-                          aria-label="Decrease quantity"
-                        >
-                          −
-                        </button>
-                        <span className="product-modal__qty-val">
-                          {selectedProduct.quantity}
-                        </span>
-                        <button
-                          type="button"
-                          className="product-modal__qty-btn"
-                          onClick={() => {
-                            updateSelected(
-                              calculatePrice({
-                                ...selectedProduct,
-                                quantity: Math.min(
-                                  10,
-                                  selectedProduct.quantity + 1,
-                                ),
-                              }),
-                            );
-                          }}
-                          aria-label="Increase quantity"
-                        >
-                          +
-                        </button>
-                      </div>
-                      <button
-                        type="button"
-                        className="product-modal__add-btn"
-                        onClick={handleAddToCart}
-                      >
-                        <ShoppingBag size={20} aria-hidden />
-                        {addedFlash ? "Added to cart" : "Add to cart"}
-                      </button>
-                    </div>
-                    <div className="product-modal__trust">
-                      <div className="product-modal__trust-item">
-                        <span className="material-symbols-outlined" aria-hidden>
-                          eco
-                        </span>
-                        <div className="product-modal__trust-text">
-                          <strong>Sustainable craft</strong>
-                          <span>Eco-friendly materials used.</span>
-                        </div>
-                      </div>
-                      <div className="product-modal__trust-item">
-                        <span className="material-symbols-outlined" aria-hidden>
-                          local_shipping
-                        </span>
-                        <div className="product-modal__trust-text">
-                          <strong>Delicate shipping</strong>
-                          <span>Handled with floral wire care.</span>
+                          <div className="product-modal__trust">
+                            <div className="product-modal__trust-item">
+                              <span
+                                className="material-symbols-outlined"
+                                aria-hidden
+                              >
+                                eco
+                              </span>
+                              <div className="product-modal__trust-text">
+                                <strong>Sustainable craft</strong>
+                                <span>Eco-friendly materials used.</span>
+                              </div>
+                            </div>
+                            <div className="product-modal__trust-item">
+                              <span
+                                className="material-symbols-outlined"
+                                aria-hidden
+                              >
+                                local_shipping
+                              </span>
+                              <div className="product-modal__trust-text">
+                                <strong>Delicate shipping</strong>
+                                <span>Handled with floral wire care.</span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>,
           document.body,

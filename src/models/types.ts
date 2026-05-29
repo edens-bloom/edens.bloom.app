@@ -87,6 +87,7 @@ export interface BloomState {
   isLoading: boolean;
   error: string | null;
   selectedProduct: SelectedProduct;
+  loading: { fetchById: boolean };
   setSelectedProduct: (product: SelectedProduct) => void;
   fetchProducts: () => Promise<void>;
   fetchCart: () => Promise<void>;

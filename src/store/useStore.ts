@@ -90,6 +90,7 @@ export const useStore = create<BloomState>((set, get) => {
     user: JSON.parse(localStorage.getItem("bloom_user") || "null"),
     token: localStorage.getItem("bloom_token"),
     isLoading: false,
+    loading: { fetchById: false },
     error: null,
 
     setSelectedProduct: (product: SelectedProduct) =>
@@ -146,11 +147,11 @@ export const useStore = create<BloomState>((set, get) => {
         });
         return;
       }
-      setDraft((state) => {
-        state.isLoading = true;
-        state.error = null;
-      });
+
       if (!Object.hasOwn(existing, "addOns")) {
+        setDraft((state) => {
+          state.loading.fetchById = true;
+        });
         try {
           const response = await productService.fetchById(id);
 
@@ -162,6 +163,7 @@ export const useStore = create<BloomState>((set, get) => {
               }
             }
             state.isLoading = false;
+            state.loading.fetchById = false;
             if (isSelected) {
               state.selectedProduct = calculatePrice({
                 ...response,
@@ -178,7 +180,7 @@ export const useStore = create<BloomState>((set, get) => {
 
           setDraft((state) => {
             state.error = errorMessage;
-            state.isLoading = false;
+            state.loading.fetchById = false;
           });
         }
       }
