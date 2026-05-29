@@ -6,7 +6,7 @@ const items = [
   {
     imageUrl:
       "https://res.cloudinary.com/dkjqlvdxx/image/upload/v1779779468/Blue_lily_ktjqwk.jpg",
-    price: 800,
+    price: 825,
   },
   {
     imageUrl:
