@@ -188,7 +188,7 @@ export const useStore = create<BloomState>((set, get) => {
 
     addToCart: async (product: SelectedProduct) => {
       setDraft((state) => {
-        const index = state.cart.items.findIndex(
+        const index = state.cart?.items?.findIndex(
           (item: SelectedProduct) =>
             item.id === product.id &&
             item.price === product.price &&
@@ -207,7 +207,7 @@ export const useStore = create<BloomState>((set, get) => {
 
     removeFromCart: async (cartItem: CartItem) => {
       setDraft((state) => {
-        const index = state.cart.items.findIndex(
+        const index = state.cart?.items?.findIndex(
           (item: CartItem) =>
             item.id === cartItem.id &&
             item.price === cartItem.price &&
@@ -221,7 +221,7 @@ export const useStore = create<BloomState>((set, get) => {
 
     updateCart: (cart: SelectedProduct) => {
       setDraft((state) => {
-        const index = state.cart.items.findIndex(
+        const index = state.cart?.items?.findIndex(
           (item: CartItem) =>
             item.id === cart.id &&
             item.price === cart.price &&
