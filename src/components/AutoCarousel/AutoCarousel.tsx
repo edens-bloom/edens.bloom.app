@@ -6,12 +6,12 @@ const items = [
   {
     imageUrl:
       "https://res.cloudinary.com/dkjqlvdxx/image/upload/v1779779468/Blue_lily_ktjqwk.jpg",
-    price: 825,
+    price: 900,
   },
   {
     imageUrl:
       "https://res.cloudinary.com/dkjqlvdxx/image/upload/v1779779468/Decor_Flower_d06kvs.jpg",
-    price: 200,
+    price: 250,
   },
   {
     imageUrl:
@@ -21,7 +21,7 @@ const items = [
   {
     imageUrl:
       "https://res.cloudinary.com/dkjqlvdxx/image/upload/v1779779762/mixed_bouquet_htrkdi.jpg",
-    price: 750,
+    price: 850,
   },
 ];
 
