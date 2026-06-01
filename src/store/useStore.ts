@@ -10,6 +10,7 @@ import type {
 } from "../models/types";
 import { productService, authService } from "../services";
 import calculatePrice from "../utils/calculatePrice";
+import orderService from "../services/orderService";
 
 // Initialize empty cart state
 const initializeCart = (): CartState => ({
@@ -102,6 +103,14 @@ export const useStore = create<BloomState>((set, get) => {
       setDraft((state) => {
         state.selectedProduct = product;
       });
+    },
+
+    onConfirm: async () => {
+      const { user, cart } = get();
+      if (!user || !user.phoneNumber) {
+        throw new Error("Please provide valid contact details before confirming the order.");
+      }
+      return orderService.orderConfirm(user, cart);
     },
 
     fetchProducts: async () => {

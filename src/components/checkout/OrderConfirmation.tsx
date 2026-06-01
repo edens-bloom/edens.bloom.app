@@ -8,14 +8,8 @@ import { useNavigate } from "react-router-dom";
 
 interface OrderConfirmationProps {
   onClose: () => void;
-  onConfirm: (userInfo: UserInfo) => void;
+  onConfirm: () => Promise<void>;
   total: number;
-}
-
-interface UserInfo {
-  name: string;
-  phone: string;
-  address: string;
 }
 
 const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
@@ -24,8 +18,11 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
   total,
 }) => {
   const { updateUser, user, clearCart } = useStore();
+  const [orderNumber] = useState(() => Math.floor(Math.random() * 1000000));
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [description, setDescription] = useState("");
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   // const [user, setUserInfo] = useState<User>({
   //   name: user?.name || "",
@@ -38,13 +35,31 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
+    if (name === "description") {
+      setDescription(value);
+      return;
+    }
+
     updateUser({ ...user, [name]: value } as Partial<User>);
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError(null);
+
     if (user?.name && user.phoneNumber && user.address) {
-      setIsFormSubmitted(true);
+      try {
+        setIsSubmitting(true);
+        await onConfirm();
+        clearCart();
+        setIsFormSubmitted(true);
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to submit order.";
+        setSubmitError(errorMessage);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -107,12 +122,12 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
               </div>
 
               <div className="form-group">
-                <label htmlFor="address">Description</label>
+                <label htmlFor="description">Description</label>
                 <textarea
-                  id="address"
-                  name="address"
+                  id="description"
+                  name="description"
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={handleInputChange}
                   placeholder="Enter any additional details"
                   rows={3}
                 />
@@ -125,6 +140,9 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                 </div>
               </div>
 
+              {submitError && (
+                <div className="form-error">{submitError}</div>
+              )}
               <div className="modal-footer">
                 <button
                   type="button"
@@ -136,9 +154,9 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                 <button
                   type="submit"
                   className="primary-btn"
-                  disabled={!isFormValid}
+                  disabled={!isFormValid || isSubmitting}
                 >
-                  Proceed to Order
+                  {isSubmitting ? "Submitting order..." : "Proceed to Order"}
                 </button>
               </div>
             </form>
@@ -150,7 +168,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                 <CheckCircle size={48} strokeWidth={1.5} />
               </div>
               <h2>Thank You for Your Order!</h2>
-              <p>Order #BLOOM-{Math.floor(Math.random() * 1000000)}</p>
+              <p>Order #BLOOM-{orderNumber}</p>
             </div>
 
             <div className="modal-body">

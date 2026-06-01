@@ -7,23 +7,19 @@ import "./Cart.scss";
 import { OrderConfirmation } from "../components";
 import type { SelectedProduct } from "../models/types";
 
-interface UserInfo {
-  name: string;
-  phone: string;
-  address: string;
-}
-
 const Cart: React.FC = () => {
-  const { cart, removeFromCart, clearCart, updateCart } = useStore();
+  const { cart, removeFromCart, clearCart, updateCart, onConfirm } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleCheckout = () => setIsModalOpen(true);
 
-  const handleConfirmOrder = (userInfo: UserInfo) => {
-    // TODO: Send order to backend with userInfo
-    clearCart();
-    setIsModalOpen(false);
+  const handleConfirmOrder = async () => {
+    try {
+      await onConfirm();
+    } catch (err: unknown) {
+      console.error("Order confirmation failed:", err);
+    }
   };
 
   useEffect(() => {
