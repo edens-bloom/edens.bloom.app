@@ -8,7 +8,7 @@ import { OrderConfirmation } from "../components";
 import type { SelectedProduct } from "../models/types";
 
 const Cart: React.FC = () => {
-  const { cart, removeFromCart, clearCart, updateCart, onConfirm } = useStore();
+  const { cart, removeFromCart, updateCart, onConfirm } = useStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
