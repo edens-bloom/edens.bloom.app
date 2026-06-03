@@ -93,6 +93,7 @@ export const useStore = create<BloomState>((set, get) => {
     isLoading: false,
     loading: { fetchById: false },
     error: null,
+    orders: [],
 
     setSelectedProduct: (product: SelectedProduct) =>
       setDraft((state) => {
@@ -108,9 +109,44 @@ export const useStore = create<BloomState>((set, get) => {
     onConfirm: async () => {
       const { user, cart } = get();
       if (!user || !user.phoneNumber) {
-        throw new Error("Please provide valid contact details before confirming the order.");
+        throw new Error(
+          "Please provide valid contact details before confirming the order.",
+        );
       }
-      return orderService.orderConfirm(user, cart);
+      const order = await orderService.orderConfirm(user, cart);
+      setDraft((state) => {
+        state.orders.unshift(order);
+      });
+      return order;
+    },
+
+    fetchOrders: async () => {
+      setDraft((state) => {
+        state.isLoading = true;
+        state.error = null;
+      });
+
+      try {
+        const response = await orderService.fetchAllOrders();
+        const orders =
+          response?.data?.orders ||
+          response?.orders ||
+          response?.data ||
+          response ||
+          [];
+
+        setDraft((state) => {
+          state.orders = Array.isArray(orders) ? orders : [];
+          state.isLoading = false;
+        });
+      } catch (err: unknown) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Failed to fetch orders";
+        setDraft((state) => {
+          state.error = errorMessage;
+          state.isLoading = false;
+        });
+      }
     },
 
     fetchProducts: async () => {

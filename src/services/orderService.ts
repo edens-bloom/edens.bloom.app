@@ -1,6 +1,43 @@
 import apiClient from "../api/apiClient";
 import type { CartState, User } from "../models/types";
 
+export interface OrderWithCustomer {
+  id: number;
+  order_number: string;
+  status: string;
+  total_amount: number;
+  subtotal: number;
+  tax_amount: number;
+  shipping_fee: number;
+  discount_amount: number;
+  created_at: string;
+  customer_id: number;
+  name: string;
+  phone: string;
+  email: string;
+  address: string;
+}
+
+export interface OrderItem {
+  id: number;
+  order_id: number;
+  product_id: number;
+  addon_id: number | null;
+  buy_quantity: number;
+  free_quantity: number;
+  total_quantity: number;
+  price_at_order: number;
+  addon_price_at_order: number;
+  subtotal: number;
+  product_name: string;
+  image_url: string;
+  addon_label: string | null;
+}
+
+export interface OrderDetail extends OrderWithCustomer {
+  items: OrderItem[];
+}
+
 const orderService = {
   orderConfirm: async (user: User | null, cart: CartState) => {
     if (!user?.phoneNumber) {
@@ -24,6 +61,24 @@ const orderService = {
       };
       error.cause = err;
       throw error;
+    }
+  },
+
+  fetchAllOrders: async () => {
+    try {
+      const response = await apiClient.get(`/orders`);
+      return response.data;
+    } catch (err: unknown) {
+      throw new Error("Failed to fetch orders");
+    }
+  },
+
+  fetchOrderById: async (id: number) => {
+    try {
+      const response = await apiClient.get(`/orders/${id}`);
+      return response.data;
+    } catch (err: unknown) {
+      throw new Error("Failed to fetch order details");
     }
   },
 };

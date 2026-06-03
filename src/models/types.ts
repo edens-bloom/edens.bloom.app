@@ -88,7 +88,7 @@ export interface BloomState {
   error: string | null;
   selectedProduct: SelectedProduct;
   loading: { fetchById: boolean };
-  onConfirm: () => Promise<void>;
+  onConfirm: () => Promise<unknown>;
   setSelectedProduct: (product: SelectedProduct) => void;
   fetchProducts: () => Promise<void>;
   fetchCart: () => Promise<void>;
@@ -111,4 +111,6 @@ export interface BloomState {
   updateSelectedProduct: (product: SelectedProduct) => void;
   updateCart: (item: SelectedProduct) => void;
   updateUser: (user: Partial<User>) => void;
+  orders: CartState[];
+  fetchOrders: () => Promise<void>;
 }

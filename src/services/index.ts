@@ -6,3 +6,4 @@
 export { productService } from "./productService";
 export { authService } from "./authService";
 export { designRequestService } from "./designRequestService";
+export { default as orderService } from "./orderService";
