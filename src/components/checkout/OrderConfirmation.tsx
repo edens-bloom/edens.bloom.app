@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CheckCircle, Home, ShoppingBag } from "lucide-react";
 import { formatRs } from "../../utils/formatRs";
 import "./OrderConfirmation.scss";
@@ -30,6 +30,15 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
   //   address: user?.address || "",
   //   email: user?.email || "",
   // });
+
+  // Disable body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -140,9 +149,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({
                 </div>
               </div>
 
-              {submitError && (
-                <div className="form-error">{submitError}</div>
-              )}
+              {submitError && <div className="form-error">{submitError}</div>}
               <div className="modal-footer">
                 <button
                   type="button"

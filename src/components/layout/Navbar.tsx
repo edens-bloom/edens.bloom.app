@@ -1,25 +1,25 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useStore } from "../../store/useStore";
 
 const Navbar: React.FC = () => {
   const location = useLocation();
-  const { getCartCount, user, logout, wishlist, toggleWishlist } = useStore();
+  const { getCartCount, user, logout } = useStore();
 
   const shopActive =
     location.pathname === "/" || /^\/item\/\d+/.test(location.pathname);
 
-  const detailProductId = useMemo(() => {
-    const m = location.pathname.match(/^\/item\/(\d+)/);
-    return m ? Number(m[1]) : null;
-  }, [location.pathname]);
+  // const detailProductId = useMemo(() => {
+  //   const m = location.pathname.match(/^\/item\/(\d+)/);
+  //   return m ? Number(m[1]) : null;
+  // }, [location.pathname]);
 
-  const onWishlistClick = () => {
-    if (detailProductId != null) toggleWishlist(detailProductId);
-  };
+  // const onWishlistClick = () => {
+  //   if (detailProductId != null) toggleWishlist(detailProductId);
+  // };
 
-  const wishlisted =
-    detailProductId != null && wishlist.includes(detailProductId);
+  // const wishlisted =
+  //   detailProductId != null && wishlist.includes(detailProductId);
 
   return (
     <nav className="site-nav">
@@ -83,7 +83,7 @@ const Navbar: React.FC = () => {
               <span className="site-nav__cart-badge">{getCartCount()}</span>
             )}
           </Link>
-          <button
+          {/* <button
             type="button"
             className={`site-nav__wishlist material-symbols-outlined press-effect${wishlisted ? " site-nav__wishlist--active" : ""}`}
             onClick={onWishlistClick}
@@ -96,7 +96,7 @@ const Navbar: React.FC = () => {
             disabled={detailProductId == null}
           >
             {wishlisted ? "favorite" : "favorite_border"}
-          </button>
+          </button> */}
           {user && (
             <div className="site-nav__user">
               <span className="site-nav__username">{}</span>
@@ -118,13 +118,13 @@ const Navbar: React.FC = () => {
           //     person
           //   </Link>
           // ) */}
-          <button
+          {/* <button
             type="button"
             className="site-nav__icon-btn site-nav__icon-btn--menu material-symbols-outlined"
             aria-label="Open menu"
           >
             menu
-          </button>
+          </button> */}
         </div>
       </div>
     </nav>

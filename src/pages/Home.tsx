@@ -21,6 +21,7 @@ const Home: React.FC = () => {
           textAlign: "center",
           fontSize: 14,
           fontWeight: 500,
+          marginBottom: "20px",
         }}
       >
         Contact 9861476014 now — the website is still in development and may not
