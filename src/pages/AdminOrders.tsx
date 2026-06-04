@@ -1,35 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Eye, Loader, AlertCircle, Phone, Calendar } from "lucide-react";
-import { orderService } from "../services";
 import { formatRs } from "../utils/formatRs";
-import type { OrderWithCustomer } from "../services/orderService";
+import type { OrderWithCustomer, OrderDetail } from "../services/orderService";
+import { useStore } from "../store/useStore";
 import "./AdminOrders.scss";
 
 const AdminOrders: React.FC = () => {
-  const [orders, setOrders] = useState<OrderWithCustomer[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedOrder, setSelectedOrder] = useState<OrderWithCustomer | null>(
-    null,
-  );
+  const orders = useStore((s) => s.orders || []);
+  const fetchOrders = useStore((s) => s.fetchOrders);
+  const isLoading = useStore((s) => s.isLoading);
+  const error = useStore((s) => s.error);
+  const [selectedOrder, setSelectedOrder] = useState<OrderDetail | null>(null);
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const response = await orderService.fetchAllOrders();
-        setOrders(response.data.orders || []);
-      } catch (err: unknown) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to load orders";
-        setError(errorMessage);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchOrders();
-  }, []);
+  }, [fetchOrders]);
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -69,10 +54,7 @@ const AdminOrders: React.FC = () => {
         <div className="orders-header">
           <h1>Orders Management</h1>
           <p>Track and manage all customer orders</p>
-          <button
-            className="btn-refresh"
-            // onClick={fetchOrders}
-          >
+          <button className="btn-refresh" onClick={fetchOrders}>
             Refresh
           </button>
         </div>
@@ -103,7 +85,7 @@ const AdminOrders: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order) => (
+                {orders.map((order: any) => (
                   <tr key={order.id} className="order-row">
                     <td className="order-number">
                       <strong>{order.order_number}</strong>
@@ -132,7 +114,7 @@ const AdminOrders: React.FC = () => {
                     <td className="order-actions">
                       <button
                         className="btn-view"
-                        onClick={() => setSelectedOrder(order)}
+                        onClick={() => setSelectedOrder(order as OrderDetail)}
                       >
                         <Eye size={16} />
                       </button>
@@ -230,6 +212,36 @@ const AdminOrders: React.FC = () => {
               <div className="detail-section">
                 <h3>Order Date</h3>
                 <p>{formatDate(selectedOrder.created_at)}</p>
+              </div>
+
+              <div className="detail-section">
+                <h3>Items</h3>
+                <div className="order-items">
+                  {(selectedOrder.items || []).map((item: any) => (
+                    <div className="order-item" key={item.id}>
+                      <div className="item-image">
+                        {item.image_url ? (
+                          // eslint-disable-next-line jsx-a11y/img-redundant-alt
+                          <img
+                            src={item.image_url}
+                            alt={item.product_name || "image"}
+                          />
+                        ) : null}
+                      </div>
+                      <div className="item-info">
+                        <div className="item-name">{item.product_name}</div>
+                        {item.addon_label && (
+                          <div className="item-addon">{item.addon_label}</div>
+                        )}
+                        <div className="item-meta">
+                          <span>Qty: {item.total_quantity}</span>
+                          <span>Price: {formatRs(item.price_at_order)}</span>
+                          <span>Subtotal: {formatRs(item.subtotal)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
