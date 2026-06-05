@@ -45,6 +45,7 @@ export interface Product {
   addOns?: ProductAddon[];
   inStock?: boolean;
   imageUrl: string;
+  productNumber: string;
 }
 
 export interface CartItem extends SelectedProduct {

@@ -797,7 +797,7 @@
 
 .product-card__media {
   position: relative;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 3 / 4;
   border-radius: $radius-card;
   overflow: hidden;
   background: $color-surface-container;
@@ -936,6 +936,18 @@
   // white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.product-card__product-number {
+  @include type-headline-lg;
+  font-size: 10px;
+  color: #999;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.02em;
+  text-align: left;
+  margin: 3px 0;
+  display: block;
 }
 
 .product-card__price-row {
