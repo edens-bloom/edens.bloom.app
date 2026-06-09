@@ -24,7 +24,7 @@ const Home: React.FC = () => {
           marginBottom: "20px",
         }}
       >
-        Contact 9861476014 now — the website is still in development and may not
+        Contact 9861476014 now, the website is still in development and may not
         be fully working.
       </div>
       <Hero />
