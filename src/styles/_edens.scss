@@ -957,7 +957,7 @@
   @include type-headline-lg;
   font-size: 13px;
   color: $color-on-background;
-  // white-space: nowrap;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.25;
