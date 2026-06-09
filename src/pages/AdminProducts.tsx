@@ -65,6 +65,7 @@ const AdminProducts: React.FC = () => {
     price: "",
     oldPrice: "",
     category: "Roses",
+    productType: "others",
     badge: "",
     rating: "5",
     description: "",
@@ -79,6 +80,7 @@ const AdminProducts: React.FC = () => {
       price: "",
       oldPrice: "",
       category: "Roses",
+      productType: "others",
       badge: "",
       rating: "5",
       description: "",
@@ -98,6 +100,7 @@ const AdminProducts: React.FC = () => {
         price: productDetails.price?.toString() || "",
         oldPrice: productDetails.oldPrice?.toString() || "",
         category: productDetails.category || "Roses",
+        productType: productDetails.productType || "others",
         badge: productDetails.badge || "",
         rating: productDetails.rating?.toString() || "5",
         description: productDetails.description || "",
@@ -425,6 +428,37 @@ const AdminProducts: React.FC = () => {
                 <option value="Peonies">Peonies</option>
                 <option value="Wildflowers">Wildflowers</option>
                 <option value="Dried">Dried</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label
+                style={{
+                  display: "block",
+                  marginBottom: "0.5rem",
+                  fontSize: "0.9rem",
+                }}
+              >
+                Product Type *
+              </label>
+              <select
+                name="productType"
+                value={formData.productType}
+                onChange={handleChange}
+                style={{
+                  width: "100%",
+                  padding: "0.6rem",
+                  borderRadius: "0.4rem",
+                  border: "1px solid #ddd",
+                }}
+              >
+                <option value="others">Others</option>
+                <option value="bouquet">Bouquet</option>
+                <option value="keyChain">Key Chain</option>
+                <option value="pot flower">Pot Flower</option>
+                <option value="hair clip">Hair Clip</option>
+                <option value="materials">Materials</option>
+                <option value="single rose">Single Rose</option>
               </select>
             </div>
 

@@ -26,6 +26,7 @@ export interface Product {
   price: number;
   oldPrice?: number;
   category: string;
+  productType?: string;
   image: string;
   plasticBagImage?: string;
   plasticBagTitle?: string;
