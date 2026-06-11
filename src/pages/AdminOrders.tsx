@@ -96,7 +96,7 @@ const AdminOrders: React.FC = () => {
                       {order.phone}
                     </td>
                     <td className="order-amount">
-                      <strong>{formatRs(order.total_amount)}</strong>
+                      <strong>{formatRs(+order.total_amount)}</strong>
                     </td>
                     <td className="order-status">
                       <span
@@ -171,29 +171,29 @@ const AdminOrders: React.FC = () => {
                 <div className="summary-items">
                   <div className="summary-row">
                     <span>Subtotal</span>
-                    <span>{formatRs(selectedOrder.subtotal)}</span>
+                    <span>{formatRs(+selectedOrder.subtotal)}</span>
                   </div>
                   {selectedOrder.tax_amount > 0 && (
                     <div className="summary-row">
                       <span>Tax</span>
-                      <span>{formatRs(selectedOrder.tax_amount)}</span>
+                      <span>{formatRs(+selectedOrder.tax_amount)}</span>
                     </div>
                   )}
                   {selectedOrder.shipping_fee > 0 && (
                     <div className="summary-row">
                       <span>Shipping</span>
-                      <span>{formatRs(selectedOrder.shipping_fee)}</span>
+                      <span>{formatRs(+selectedOrder.shipping_fee)}</span>
                     </div>
                   )}
                   {selectedOrder.discount_amount > 0 && (
                     <div className="summary-row discount">
                       <span>Discount</span>
-                      <span>-{formatRs(selectedOrder.discount_amount)}</span>
+                      <span>-{formatRs(+selectedOrder.discount_amount)}</span>
                     </div>
                   )}
                   <div className="summary-row total">
                     <span>Total</span>
-                    <span>{formatRs(selectedOrder.total_amount)}</span>
+                    <span>{formatRs(+selectedOrder.total_amount)}</span>
                   </div>
                 </div>
               </div>
@@ -217,30 +217,38 @@ const AdminOrders: React.FC = () => {
               <div className="detail-section">
                 <h3>Items</h3>
                 <div className="order-items">
-                  {(selectedOrder.items || []).map((item: any) => (
-                    <div className="order-item" key={item.id}>
-                      <div className="item-image">
-                        {item.image_url ? (
-                          // eslint-disable-next-line jsx-a11y/img-redundant-alt
-                          <img
-                            src={item.image_url}
-                            alt={item.product_name || "image"}
-                          />
-                        ) : null}
-                      </div>
-                      <div className="item-info">
-                        <div className="item-name">{item.product_name}</div>
-                        {item.addon_label && (
-                          <div className="item-addon">{item.addon_label}</div>
-                        )}
-                        <div className="item-meta">
-                          <span>Qty: {item.total_quantity}</span>
-                          <span>Price: {formatRs(item.price_at_order)}</span>
-                          <span>Subtotal: {formatRs(item.subtotal)}</span>
+                  {(selectedOrder.items || []).map((item: any) => {
+                    const imgUrl = item.addon
+                      ? item.addon.imageUrl
+                      : item.image_url;
+                    const price = item.addon
+                      ? item.addon.price
+                      : item.price_at_order;
+                    return (
+                      <div className="order-item" key={item.id}>
+                        <div className="item-image">
+                          {item.image_url ? (
+                            // eslint-disable-next-line jsx-a11y/img-redundant-alt
+                            <img
+                              src={imgUrl}
+                              alt={item.product_name || "image"}
+                            />
+                          ) : null}
+                        </div>
+                        <div className="item-info">
+                          <div className="item-name">{item.product_name}</div>
+                          {item.addon_label && (
+                            <div className="item-addon">{item.addon_label}</div>
+                          )}
+                          <div className="item-meta">
+                            <span>Qty: {item.total_quantity}</span>
+                            <span>Price: {formatRs(+price)}</span>
+                            <span>Subtotal: {formatRs(+item.subtotal)}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
