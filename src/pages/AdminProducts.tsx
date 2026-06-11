@@ -1013,6 +1013,7 @@ const AdminProducts: React.FC = () => {
               <th style={{ padding: "1rem" }}>Product</th>
               <th style={{ padding: "1rem" }}>Category</th>
               <th style={{ padding: "1rem" }}>Price</th>
+              <th style={{ padding: "1rem" }}>Type</th>
               <th style={{ padding: "1rem" }}>Badge</th>
               <th style={{ padding: "1rem" }}>Stats</th>
               <th style={{ padding: "1rem" }}>Actions</th>
@@ -1044,7 +1045,7 @@ const AdminProducts: React.FC = () => {
                   }}
                 >
                   <img
-                    src={product.noBagImage || product.image}
+                    src={product.imageUrl || product.image}
                     alt=""
                     style={{
                       width: "50px",
@@ -1097,6 +1098,9 @@ const AdminProducts: React.FC = () => {
                       {formatRs(Number(product.oldPrice))}
                     </div>
                   )}
+                </td>
+                <td style={{ padding: "1rem" }}>
+                  {product.productType || "-"}
                 </td>
                 <td style={{ padding: "1rem" }}>{product.badge || "-"}</td>
                 <td style={{ padding: "1rem" }}>

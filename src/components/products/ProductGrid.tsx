@@ -308,12 +308,24 @@ const ProductGrid: React.FC = () => {
                               ))}
                             </div>
                           </div>
-                          <div style={{ display: "flex", flexDirection: "column", gap: "3px" }}>
-                            <h1 className="product-modal__title" style={{ marginBottom: 0 }}>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: "3px",
+                            }}
+                          >
+                            <h1
+                              className="product-modal__title"
+                              style={{ marginBottom: 0 }}
+                            >
                               {selectedProduct.name}
                             </h1>
                             {selectedProduct.productNumber && (
-                              <span className="product-card__product-number" style={{ margin: 0 }}>
+                              <span
+                                className="product-card__product-number"
+                                style={{ margin: 0 }}
+                              >
                                 Product Number: {selectedProduct.productNumber}
                               </span>
                             )}
