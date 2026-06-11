@@ -157,7 +157,9 @@ export const useStore = create<BloomState>((set, get) => {
       try {
         const response = await productService.fetchAll();
         setDraft((state) => {
-          state.products = response;
+          state.products = response.sort(
+            (a: Product, b: Product) => a.id - b.id,
+          );
           state.isLoading = false;
         });
       } catch (err: unknown) {
