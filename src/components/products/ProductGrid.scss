@@ -96,7 +96,7 @@
   display: grid;
   grid-template-columns: 1fr;
   gap: 0;
-  padding: 0;
+  padding: 0 10px;
 
   @media (min-width: $bp-lg) {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
@@ -545,7 +545,6 @@
   touch-action: manipulation;
 
   @media (max-width: 480px) {
-    min-width: 100%;
     padding: 0.65rem 0.9rem;
     font-size: 0.75rem;
   }
