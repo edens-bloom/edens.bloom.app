@@ -422,8 +422,8 @@ const ProductGrid: React.FC = () => {
                                 </p>
                                 <div className="product-modal__packaging">
                                   <button
-                                    type="button"
                                     className={`product-modal__pack${!selectedProduct?.selectedAddOnId ? " product-modal__pack--active" : ""}`}
+                                    type="button"
                                     onClick={() =>
                                       updateSelected(
                                         calculatePrice({
@@ -436,21 +436,39 @@ const ProductGrid: React.FC = () => {
                                       )
                                     }
                                   >
-                                    <div className="product-modal__pack-label">
-                                      No bag
-                                    </div>
-                                    <div className="product-modal__pack-price">
-                                      {formatRs(
-                                        Number(selectedProduct.price ?? 0),
-                                      )}
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "8px",
+                                        justifyContent: "center",
+                                      }}
+                                    >
+                                      <input
+                                        type="radio"
+                                        name="packaging"
+                                        checked={
+                                          !selectedProduct?.selectedAddOnId
+                                        }
+                                      />
+                                      <div>
+                                        <div className="product-modal__pack-label">
+                                          No bag
+                                        </div>
+                                        <div className="product-modal__pack-price">
+                                          {formatRs(
+                                            Number(selectedProduct.price ?? 0),
+                                          )}
+                                        </div>
+                                      </div>
                                     </div>
                                   </button>
 
                                   {selectedProduct?.addOns?.map((addon) => (
                                     <button
+                                      className={`product-modal__pack${selectedProduct?.selectedAddOnId === addon.id ? " product-modal__pack--active" : ""}`}
                                       key={addon.id}
                                       type="button"
-                                      className={`product-modal__pack${selectedProduct?.selectedAddOnId === addon.id ? " product-modal__pack--active" : ""}`}
                                       onClick={() =>
                                         updateSelected(
                                           calculatePrice({
@@ -464,11 +482,29 @@ const ProductGrid: React.FC = () => {
                                         )
                                       }
                                     >
-                                      <div className="product-modal__pack-label">
-                                        {addon.label}
-                                      </div>
-                                      <div className="product-modal__pack-price">
-                                        {formatRs(Number(addon.price ?? 0))}
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          alignItems: "center",
+                                          gap: "8px",
+                                          justifyContent: "center",
+                                        }}
+                                      >
+                                        <input
+                                          type="radio"
+                                          checked={
+                                            selectedProduct?.selectedAddOnId ===
+                                            addon.id
+                                          }
+                                        />
+                                        <div>
+                                          <div className="product-modal__pack-label">
+                                            {addon.label}
+                                          </div>
+                                          <div className="product-modal__pack-price">
+                                            {formatRs(Number(addon.price ?? 0))}
+                                          </div>
+                                        </div>
                                       </div>
                                     </button>
                                   ))}
