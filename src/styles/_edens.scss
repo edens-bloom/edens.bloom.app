@@ -492,6 +492,9 @@
   background: $color-primary;
   color: $color-on-primary;
   padding: 2.5rem 0;
+  @media (max-width: $mobile) {
+    padding: 10px;
+  }
 }
 
 .feature-strip__inner {
@@ -1013,7 +1016,10 @@
 // ---------------------------------------------------------------------------
 .why-section {
   background: $color-surface-container-low;
-  padding: 6rem 0;
+  padding: 3rem 0;
+  @media (max-width: $mobile) {
+    padding: 1rem 0;
+  }
 }
 
 .why-section__inner {
@@ -1032,6 +1038,11 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
+
+  @media (max-width: $mobile) {
+    grid-template-columns: 1fr;
+    gap: 0rem;
+  }
 }
 
 .why-section__col {
@@ -1246,6 +1257,9 @@
 .footer-cta {
   background: $color-surface-container;
   padding: 6rem 0;
+  @media (max-width: $mobile) {
+    padding: 2rem 0;
+  }
 }
 
 .footer-cta__inner {

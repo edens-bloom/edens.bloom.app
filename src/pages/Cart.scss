@@ -2,7 +2,7 @@
 @use "sass:color";
 
 .cart-page {
-  padding-top: 96px;
+  padding-top: 10px;
   padding-bottom: 72px;
   min-height: 100vh;
   background-color: #fbf9f5;
@@ -16,11 +16,10 @@
 
   .cart-main {
     .cart-heading {
-      margin-bottom: 2rem;
+      margin-bottom: 0.5rem;
 
-      h1 {
+      h3 {
         font-family: "Plus Jakarta Sans", $sans;
-        font-size: clamp(2rem, 3vw, 3rem);
         font-weight: 700;
         color: #1b1c1a;
 
@@ -87,7 +86,7 @@
       }
 
       @media (max-width: 820px) {
-        width: 100%;
+        width: 100px;
         max-height: 210px;
       }
     }
@@ -225,7 +224,6 @@
       border-radius: 999px;
       padding: 0.25rem;
       justify-content: space-between;
-      width: 124px;
 
       button {
         width: 38px;
@@ -257,10 +255,6 @@
         color: #1b1c1a;
         min-width: 20px;
         text-align: center;
-      }
-
-      @media (max-width: 820px) {
-        width: 104px;
       }
     }
 

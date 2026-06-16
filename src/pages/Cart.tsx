@@ -61,12 +61,12 @@ const Cart: React.FC = () => {
       <div className="cart-container">
         <div className="cart-main">
           <div className="cart-heading">
-            <h1>
+            <h3>
               Shopping Cart{" "}
               <span>
                 ({cart.items.length} {cart.items.length > 1 ? "items" : "item"})
               </span>
-            </h1>
+            </h3>
           </div>
 
           <div className="cart-grid">
@@ -115,36 +115,35 @@ const Cart: React.FC = () => {
                             />
                             <span>{getLabelAndPrice(item)}</span>
                           </label>
+                          <div className="item-quantity">
+                            <button
+                              onClick={() =>
+                                updateCart({
+                                  ...item,
+                                  quantity: Math.max(1, item.quantity - 1),
+                                })
+                              }
+                              aria-label="Decrease quantity"
+                            >
+                              <Minus size={16} />
+                            </button>
+                            <span>{item.quantity}</span>
+                            <button
+                              onClick={() =>
+                                updateCart({
+                                  ...item,
+                                  quantity: Math.min(10, item.quantity + 1),
+                                })
+                              }
+                              aria-label="Increase quantity"
+                            >
+                              <Plus size={16} />
+                            </button>
+                          </div>
                         </div>
                       </div>
 
                       <div className="item-footer">
-                        <div className="item-quantity">
-                          <button
-                            onClick={() =>
-                              updateCart({
-                                ...item,
-                                quantity: Math.max(1, item.quantity - 1),
-                              })
-                            }
-                            aria-label="Decrease quantity"
-                          >
-                            <Minus size={16} />
-                          </button>
-                          <span>{item.quantity}</span>
-                          <button
-                            onClick={() =>
-                              updateCart({
-                                ...item,
-                                quantity: Math.min(10, item.quantity + 1),
-                              })
-                            }
-                            aria-label="Increase quantity"
-                          >
-                            <Plus size={16} />
-                          </button>
-                        </div>
-
                         <div className="item-price">
                           <p>
                             {item.name}: {item.quantity} x{" "}

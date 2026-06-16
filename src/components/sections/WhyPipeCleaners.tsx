@@ -48,7 +48,7 @@ const WhyPipeCleaners: React.FC = () => {
           </h2>
           <p className="why-section__body">
             In a world of fleeting moments, we create lasting memories. Our pipe
-            cleaner flowers aren&apos;t just crafts—they&apos;re artisanal
+            cleaner flowers aren&apos;t just crafts, they&apos;re artisanal
             sculptures that capture the whimsy of childhood and the
             sophistication of modern art.
           </p>
@@ -57,12 +57,6 @@ const WhyPipeCleaners: React.FC = () => {
             two blooms are ever identical. Experience the joy of a bouquet that
             truly stays with you.
           </p>
-          <button
-            type="button"
-            className="why-section__btn ambient-shadow ambient-shadow-hover press-effect"
-          >
-            Learn Our Story
-          </button>
         </div>
       </div>
     </section>

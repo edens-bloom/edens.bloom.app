@@ -294,18 +294,27 @@ const Footer: React.FC = () => {
             artistry for your home.
           </p>
           <div className="site-footer__social">
-            <a className="site-footer__social-link" href="#">
+            <a
+              className="site-footer__social-link"
+              href="https://www.instagram.com/edensbloom.store/"
+            >
               ig
             </a>
-            <a className="site-footer__social-link" href="#">
-              pt
+            <a
+              className="site-footer__social-link"
+              href="https://www.edensbloom.store"
+            >
+              wb
             </a>
-            <a className="site-footer__social-link" href="#">
+            <a
+              className="site-footer__social-link"
+              href="https://www.facebook.com/profile.php?id=61589409217106&sk=directory_links"
+            >
               fb
             </a>
           </div>
         </div>
-        <div className="site-footer__nav">
+        {/* <div className="site-footer__nav">
           <div>
             <h4 className="site-footer__col-title">Shop</h4>
             <ul className="site-footer__links">
@@ -357,7 +366,7 @@ const Footer: React.FC = () => {
               </li>
             </ul>
           </div>
-        </div>
+        </div> */}
       </footer>
       <div className="site-footer__bar">
         <span>© 2026 Edens Bloom. Everlasting Handcrafted Artistry.</span>
